@@ -1,28 +1,23 @@
 ﻿using AuthService.Domain.Accounts;
 using AuthService.Domain.Interfaces;
+using AuthService.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 
 namespace AuthService.Infrastructure.Repositories
 {
     public class AccountRepository : IAccountRepository
     {
-        public Task AddAsync(Account account, CancellationToken ct)
-        {
-            throw new NotImplementedException();
-        }
+        private readonly AuthDbContext _authDbContext;
+        public AccountRepository(AuthDbContext authDbContext) => _authDbContext = authDbContext;
+        public async Task<Account?> GetByEmailAsync(string email, CancellationToken ct)
+            => await _authDbContext.Accounts.FirstOrDefaultAsync(x => x.Email == email, ct);
 
-        public Task<bool> EmailExistsAsync(string email, CancellationToken ct)
-        {
-            throw new NotImplementedException();
-        }
+        public async Task<Account?> GetByIdAsync(Guid id, CancellationToken ct)
+            => await _authDbContext.Accounts.FirstOrDefaultAsync(x => x.Id == id, ct);
+        public async Task AddAsync(Account account, CancellationToken ct)
+            => await _authDbContext.Accounts.AddAsync(account, ct);
 
-        public Task<Account?> GetByEmailAsync(string email, CancellationToken ct)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<Account?> GetByIdAsync(Guid id, CancellationToken ct)
-        {
-            throw new NotImplementedException();
-        }
+        public async Task<bool> EmailExistsAsync(string email, CancellationToken ct)
+            => await _authDbContext.Accounts.AnyAsync(x => x.Email == email, ct);
     }
 }
