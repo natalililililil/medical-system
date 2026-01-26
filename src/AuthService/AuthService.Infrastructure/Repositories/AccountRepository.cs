@@ -16,8 +16,5 @@ namespace AuthService.Infrastructure.Repositories
             => await _authDbContext.Accounts.FirstOrDefaultAsync(x => x.Id == id, ct);
         public async Task AddAsync(Account account, CancellationToken ct)
             => await _authDbContext.Accounts.AddAsync(account, ct);
-
-        public async Task<bool> EmailExistsAsync(string email, CancellationToken ct)
-            => await _authDbContext.Accounts.AnyAsync(x => x.Email == email, ct);
     }
 }

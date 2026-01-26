@@ -7,6 +7,5 @@ namespace AuthService.Domain.Interfaces
         Task<Account?> GetByEmailAsync(string email, CancellationToken ct);
         Task<Account?> GetByIdAsync(Guid id, CancellationToken ct);
         Task AddAsync(Account account, CancellationToken ct);
-        Task<bool> EmailExistsAsync(string email, CancellationToken ct);
     }
 }
