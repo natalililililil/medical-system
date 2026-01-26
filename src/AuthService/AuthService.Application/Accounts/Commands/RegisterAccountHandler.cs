@@ -1,16 +1,15 @@
-﻿using AuthService.Application.Accounts.DTOs;
-using AuthService.Domain.Accounts;
+﻿using AuthService.Domain.Accounts;
 using AuthService.Domain.Interfaces;
 using MediatR;
 
 namespace AuthService.Application.Accounts.Commands
 {
-    public class RegisterAccountHandler : IRequestHandler<RegisterAccountCommand, RegisterAccountResponse>
+    public class RegisterAccountHandler : IRequestHandler<RegisterAccountCommand>
     {
         private readonly IAccountRepository _repository;
         public RegisterAccountHandler(IAccountRepository repository) => _repository = repository;
 
-        public async Task<RegisterAccountResponse> Handle(RegisterAccountCommand request, CancellationToken cancellationToken)
+        public async Task Handle(RegisterAccountCommand request, CancellationToken cancellationToken)
         {
             if (await _repository.GetByEmailAsync(request.Email, cancellationToken) != null)
             {
@@ -22,8 +21,8 @@ namespace AuthService.Application.Accounts.Commands
 
             //email token
 
-            await _repository.AddAsync(account, cancellationToken);
-            return new RegisterAccountResponse(account.Id, account.Email, account.Role.ToString());
+            _repository.Add(account);
+            await _repository.SaveAsync(cancellationToken);
         }
     }
 }
