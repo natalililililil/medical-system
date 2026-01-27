@@ -3,35 +3,116 @@ import { register } from "../api/auth";
 import "../App.css";
 
 export default function RegisterModal({ onSuccess, onClose }) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState("");
+  const [values, setValues] = useState({
+    email: "",
+    password: "",
+    confirmPassword: ""
+  });
+
+  const [touched, setTouched] = useState({});
+  const [serverError, setServerError] = useState("");
+
+  function handleChange(e) {
+    setValues(v => ({ ...v, [e.target.name]: e.target.value }));
+  }
+
+  function handleBlur(e) {
+    setTouched(t => ({ ...t, [e.target.name]: true }));
+  }
+
+  function validate(values) {
+    const errors = {};
+
+    if (!values.email) {
+      errors.email = "Please, enter the email";
+    } else if (!/\S+@\S+\.\S+/.test(values.email)) {
+      errors.email = "You've entered an invalid email";
+    }
+
+    if (!values.password) {
+      errors.password = "Please, enter the password";
+    } else if (values.password.length < 6) {
+      errors.password = "Password must be at least 6 symbols";
+    }
+
+    if (!values.confirmPassword) {
+      errors.confirmPassword = "Please, reenter the password";
+    } else if (values.password !== values.confirmPassword) {
+      errors.confirmPassword = "The passwords you’ve entered don’t coincide";
+    }
+
+    return errors;
+  }
+
+  const errors = validate(values);
+  const isValid = Object.keys(errors).length === 0;
 
   async function handleSubmit(e) {
     e.preventDefault();
-    if (password !== confirmPassword) {
-      setError("Пароли не совпадают");
-      return;
-    }
     try {
-      await register({ email, password, confirmPassword });
+      await register(values);
       onSuccess();
-    } catch {
-      setError("Ошибка регистрации");
+    } catch (err) {
+      setServerError(err.message);
     }
   }
 
   return (
     <div className="modal">
       <button className="close-button" onClick={onClose}>×</button>
+
       <form onSubmit={handleSubmit}>
         <h2>Регистрация</h2>
-        <input placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
-        <input type="password" placeholder="Пароль" value={password} onChange={e => setPassword(e.target.value)} />
-        <input type="password" placeholder="Повторите пароль" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} />
-        {error && <p className="error-message">{error}</p>}
-        <button type="submit">Зарегистрироваться</button>
+
+        <input
+          name="email"
+          placeholder="Email"
+          value={values.email}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          className={touched.email && errors.email ? "input-error" : ""}
+        />
+        {touched.email && errors.email && (
+          <p className="error-message">{errors.email}</p>
+        )}
+
+        <input
+          type="password"
+          name="password"
+          placeholder="Пароль"
+          value={values.password}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          className={touched.password && errors.password ? "input-error" : ""}
+        />
+        {touched.password && errors.password && (
+          <p className="error-message">{errors.password}</p>
+        )}
+
+        <input
+          type="password"
+          name="confirmPassword"
+          placeholder="Повторите пароль"
+          value={values.confirmPassword}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          className={
+            touched.confirmPassword && errors.confirmPassword
+              ? "input-error"
+              : ""
+          }
+        />
+        {touched.confirmPassword && errors.confirmPassword && (
+          <p className="error-message">{errors.confirmPassword}</p>
+        )}
+
+        {serverError && (
+          <p className="error-message">{serverError}</p>
+        )}
+
+        <button type="submit" disabled={!isValid}>
+          Зарегистрироваться
+        </button>
       </form>
     </div>
   );

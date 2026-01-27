@@ -48,7 +48,7 @@ body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: white; /* белый фон */
+  background-color: white;
   padding: 30px 20px;
   border-radius: 10px;
   width: 320px;
@@ -73,7 +73,7 @@ body {
 .modal input {
   width: 100%;
   padding: 10px;
-  margin-bottom: 12px;
+  margin-bottom: 4px;
   border-radius: 5px;
   border: 1px solid #ccc;
   outline: none;
@@ -86,16 +86,25 @@ body {
   padding: 10px;
   border: none;
   border-radius: 5px;
-  background-color: #80b3ff;
-  color: white;
-  cursor: pointer;
   font-weight: bold;
 }
-.modal button[type="submit"]:hover {
+
+.modal button[type="submit"]:disabled {
+  background-color: #b3d1ff;
+  color: white;
+  cursor: default;
+}
+
+.modal button[type="submit"]:not(:disabled) {
   background-color: #3399ff;
+  cursor: pointer;
 }
 
 .error-message {
   color: red;
   margin-bottom: 10px;
+}
+
+.input-error {
+  border: 1px solid red;
 }

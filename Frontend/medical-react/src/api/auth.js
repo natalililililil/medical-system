@@ -7,8 +7,19 @@ export async function register(data) {
     body: JSON.stringify(data)
   });
 
+  const result = await response.json();
+
   if (!response.ok) {
-    throw new Error("Ошибка регистрации");
+    if (result.message) {
+      throw new Error(result.message);
+    }
+
+    if (result.errors) {
+      const firstError = Object.values(result.errors)[0][0];
+      throw new Error(firstError);
+    }
+
+    throw new Error("Registration failed");
   }
 }
 
@@ -20,6 +31,6 @@ export async function confirmEmail(token) {
   });
 
   if (!response.ok) {
-    throw new Error("Ошибка подтверждения email");
+    throw new Error("Email confirmation error");
   }
 }
