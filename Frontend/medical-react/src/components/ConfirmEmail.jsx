@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { confirmEmail } from "../api/auth";
+import "../App.css";
 
 export default function ConfirmEmail() {
   const [message, setMessage] = useState("Подтверждаем email...");
@@ -19,15 +20,7 @@ export default function ConfirmEmail() {
   }, []);
 
   return (
-    <div style={{
-      position: "fixed",
-      top: "50%",
-      left: "50%",
-      transform: "translate(-50%, -50%)",
-      background: "white",
-      padding: "20px",
-      border: "1px solid #ccc"
-    }}>
+    <div className="modal">
       <h2>Подтверждение email</h2>
       <p>{message}</p>
     </div>
