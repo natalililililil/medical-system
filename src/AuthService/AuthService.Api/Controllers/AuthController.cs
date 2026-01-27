@@ -1,4 +1,5 @@
-﻿using AuthService.Application.Accounts.Commands;
+﻿using AuthService.Application.Accounts.Commands.ConfirmEmail;
+using AuthService.Application.Accounts.Commands.RegisterAccount;
 using AuthService.Application.Accounts.DTOs;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -22,5 +23,24 @@ namespace AuthService.Api.Controllers
             return Ok();
         }
 
+        [HttpPost("confirm-email")]
+        public async Task<IActionResult> ConfirmEmail([FromBody] ConfirmEmailRequest request)
+        {
+            try
+            {
+                await _mediator.Send(new ConfirmEmailCommand(request.Token));
+                return Ok(new { message = "Email confirmed successfully" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        // вспомогательный DTO
+        public class ConfirmEmailRequest
+        {
+            public string Token { get; set; } = null!;
+        }
     }
 }

@@ -16,6 +16,7 @@ namespace AuthService.Infrastructure
                     configuration.GetConnectionString("AuthDb")));
 
             services.AddScoped<IAccountRepository, AccountRepository>();
+            services.AddScoped<IEmailConfirmationTokenRepository, EmailConfirmationTokenRepository>();
 
             return services;
         }
