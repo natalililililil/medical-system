@@ -7,15 +7,15 @@ namespace AuthService.Application.Accounts.Commands.RegisterAccount
         public RegisterAccountValidator()
         {
             RuleFor(x => x.Email)
-                .NotEmpty().WithMessage("Email обязателен")
-                .EmailAddress().WithMessage("Неверный формат email");
+                .NotEmpty().WithMessage("Email is required")
+                .EmailAddress().WithMessage("Invalid email format");
 
             RuleFor(x => x.Password)
-                .NotEmpty().WithMessage("Пароль обязателен")
-                .MinimumLength(6).WithMessage("Пароль должен быть минимум 6 символов");
+                .NotEmpty().WithMessage("Password is required")
+                .MinimumLength(6).WithMessage("Password must be at least 6 characters long");
 
             RuleFor(x => x.ConfirmPassword)
-                .Equal(x => x.Password).WithMessage("Пароли не совпадают");
+                .Equal(x => x.Password).WithMessage("Passwords do not match");
         }
     }
 }

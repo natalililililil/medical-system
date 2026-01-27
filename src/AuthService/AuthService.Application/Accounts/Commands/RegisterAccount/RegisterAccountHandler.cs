@@ -19,7 +19,7 @@ namespace AuthService.Application.Accounts.Commands
         public async Task<Unit> Handle(RegisterAccountCommand request, CancellationToken cancellationToken)
         {
             if (await _accountRepository.GetByEmailAsync(request.Email, cancellationToken) != null)
-                throw new InvalidOperationException("Такой аккаунт уже существует");
+                throw new InvalidOperationException("An account with this email already exists");
 
             var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
             var account = new Account(request.Email, passwordHash);

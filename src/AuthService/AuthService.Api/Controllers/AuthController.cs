@@ -17,14 +17,14 @@ namespace AuthService.Api.Controllers
         public async Task<IActionResult> Register([FromBody] RegisterRequest request)
         {
             await _mediator.Send(new RegisterAccountCommand(request.Email, request.Password, request.ConfirmPassword));
-            return Ok();
+            return Ok(new { message = "Registration completed successfully" });
         }
 
         [HttpPost("confirm-email")]
         public async Task<IActionResult> ConfirmEmail([FromBody] ConfirmEmailRequest request)
         {
             await _mediator.Send(new ConfirmEmailCommand(request.Token));
-            return Ok();
+            return Ok(new { message = "Confirmation email sent" });
         }
     }
 }

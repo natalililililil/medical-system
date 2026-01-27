@@ -19,7 +19,7 @@ namespace AuthService.Application.Accounts.Commands.ConfirmEmail
             var emailToken = await _tokenRepository.GetByTokenAsync(request.Token, ct);
 
             if (emailToken == null || emailToken.IsUsed || emailToken.IsExpired)
-                throw new InvalidOperationException("Недействительный или просроченный токен");
+                throw new InvalidOperationException("Invalid or expired token");
 
             emailToken.Use();
 

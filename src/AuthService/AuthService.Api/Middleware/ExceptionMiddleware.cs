@@ -40,7 +40,7 @@ namespace AuthService.Api.Middleware
                 context.Response.StatusCode = 500;
                 await context.Response.WriteAsJsonAsync(new
                 {
-                    message = "Неожиданная ошибка сервера"
+                    message = "Unexpected server error"
                 });
             }
         }
