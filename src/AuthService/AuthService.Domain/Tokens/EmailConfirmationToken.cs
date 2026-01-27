@@ -19,9 +19,7 @@
             IsUsed = false;
         }
 
-        public void Use()
-        {
-            IsUsed = true;
-        }
+        public void Use() => IsUsed = true;
+        public bool IsExpired => DateTime.UtcNow >= ExpiresAt;
     }
 }
