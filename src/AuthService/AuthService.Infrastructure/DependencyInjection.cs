@@ -17,6 +17,7 @@ namespace AuthService.Infrastructure
 
             services.AddScoped<IAccountRepository, AccountRepository>();
             services.AddScoped<IEmailConfirmationTokenRepository, EmailConfirmationTokenRepository>();
+            services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
             return services;
         }
