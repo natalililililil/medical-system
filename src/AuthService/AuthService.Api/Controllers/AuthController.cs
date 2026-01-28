@@ -1,5 +1,6 @@
 ﻿using AuthService.Application.Accounts.Commands.ConfirmEmail;
 using AuthService.Application.Accounts.Commands.Login;
+using AuthService.Application.Accounts.Commands.RefreshTokenLogic;
 using AuthService.Application.Accounts.Commands.RegisterAccount;
 using AuthService.Application.Accounts.DTOs;
 using MediatR;
@@ -32,6 +33,13 @@ namespace AuthService.Api.Controllers
         public async Task<IActionResult> Login([FromBody] LoginCommand command)
         {
             var result = await _mediator.Send(command);
+            return Ok(result);
+        }
+
+        [HttpPost("refresh")]
+        public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequest request)
+        {
+            var result = await _mediator.Send(new RefreshTokenCommand(request.RefreshToken));
             return Ok(result);
         }
     }
