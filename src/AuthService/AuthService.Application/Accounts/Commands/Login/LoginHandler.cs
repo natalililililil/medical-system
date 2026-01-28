@@ -5,7 +5,7 @@ using MediatR;
 
 namespace AuthService.Application.Accounts.Commands.Login
 {
-    public class LoginHandler : IRequestHandler<LoginCommand, AuthResponse>
+    public class LoginHandler : IRequestHandler<LoginCommand, AuthTokensResponse>
     {
         private readonly IAccountRepository _accountRepository;
         private readonly IRefreshTokenRepository _refreshTokenRepository;
@@ -18,7 +18,7 @@ namespace AuthService.Application.Accounts.Commands.Login
             _jwtTokenService = jwtTokenService;
         }
 
-        public async Task<AuthResponse> Handle(LoginCommand request, CancellationToken cancellationToken)
+        public async Task<AuthTokensResponse> Handle(LoginCommand request, CancellationToken cancellationToken)
         {
             var account = await _accountRepository.GetByEmailAsync(request.Email, cancellationToken);
             if (account == null || !BCrypt.Net.BCrypt.Verify(request.Password, account.PasswordHash))
@@ -34,11 +34,7 @@ namespace AuthService.Application.Accounts.Commands.Login
             _refreshTokenRepository.Add(refreshToken, cancellationToken);
             await _refreshTokenRepository.SaveAsync(cancellationToken);
 
-            return new AuthResponse
-            {
-                AccessToken = accessToken,
-                RefreshToken = refreshTokenValue
-            };
+            return new AuthTokensResponse(accessToken, refreshTokenValue);
         }
     }
 }
