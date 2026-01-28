@@ -1,4 +1,5 @@
 ﻿using AuthService.Application.Accounts.Commands.ConfirmEmail;
+using AuthService.Application.Accounts.Commands.Login;
 using AuthService.Application.Accounts.Commands.RegisterAccount;
 using AuthService.Application.Accounts.DTOs;
 using MediatR;
@@ -25,6 +26,13 @@ namespace AuthService.Api.Controllers
         {
             await _mediator.Send(new ConfirmEmailCommand(request.Token));
             return Ok(new { message = "Confirmation email sent" });
+        }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginCommand command)
+        {
+            var result = await _mediator.Send(command);
+            return Ok(result);
         }
     }
 }
