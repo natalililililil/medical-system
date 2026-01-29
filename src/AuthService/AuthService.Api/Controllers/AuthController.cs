@@ -42,5 +42,6 @@ namespace AuthService.Api.Controllers
             var result = await _mediator.Send(new RefreshTokenCommand(request.RefreshToken));
             return Ok(result);
         }
+        public async Task<IActionResult> TestProtected()
     }
 }
