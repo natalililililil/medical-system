@@ -25,8 +25,7 @@ namespace AuthService.Application.Accounts.Commands.RefreshTokenLogic
             if (refresh == null || !refresh.IsActive)
                 throw new InvalidOperationException("Invalid refresh token");
 
-            var account = await _accountRepository
-                .GetByIdAsync(refresh.AccountId, ct);
+            var account = await _accountRepository.GetByIdAsync(refresh.AccountId, ct);
 
             if (account == null)
                 throw new InvalidOperationException("Account not found");
