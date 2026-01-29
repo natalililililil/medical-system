@@ -4,6 +4,7 @@ using AuthService.Application.Accounts.Commands.RefreshTokenLogic;
 using AuthService.Application.Accounts.Commands.RegisterAccount;
 using AuthService.Application.Accounts.DTOs;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AuthService.Api.Controllers
@@ -42,6 +43,12 @@ namespace AuthService.Api.Controllers
             var result = await _mediator.Send(new RefreshTokenCommand(request.RefreshToken));
             return Ok(result);
         }
+
+        [HttpGet("protected")]
+        [Authorize]
         public async Task<IActionResult> TestProtected()
+        {
+            return Ok(new { message = "eeeeeee!" });
+        }
     }
 }
