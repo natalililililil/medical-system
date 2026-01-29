@@ -21,7 +21,12 @@ export default function LoginModal({ onClose }) {
     if (!values.email) errors.email = "Please, enter the email";
     else if (!/\S+@\S+\.\S+/.test(values.email)) errors.email = "You've entered an invalid email";
 
-    if (!values.password) errors.password = "Please, enter the password";
+    if (!values.password) {
+      errors.password = "Please, enter the password";
+    } else if (values.password.length < 6) {
+      errors.password = "Password must be at least 6 symbols";
+    }
+    
     return errors;
   }
 
