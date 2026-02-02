@@ -39,7 +39,7 @@ namespace AuthService.Application.Accounts.Commands.RefreshTokenLogic
                 DateTime.UtcNow.AddDays(7)
             );
 
-            _refreshRepository.Add(newRefresh, ct);
+            await _refreshRepository.AddAsync(newRefresh, ct);
 
             var access = _jwt.GenerateAccessToken(account.Id, account.Email);
 

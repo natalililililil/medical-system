@@ -12,9 +12,8 @@ namespace AuthService.Infrastructure.Repositories
 
         public async Task<EmailConfirmationToken?> GetByTokenAsync(string token, CancellationToken cancellationToken)
             => await _context.EmailConfirmationTokens.FirstOrDefaultAsync(x => x.Token == token, cancellationToken);
-        public void Add(EmailConfirmationToken token)
-            => _context.EmailConfirmationTokens.Add(token);
-
+        public async Task AddAsync(EmailConfirmationToken token)
+            => await _context.EmailConfirmationTokens.AddAsync(token);
         public async Task SaveAsync(CancellationToken cancellationToken)
             => await _context.SaveChangesAsync(cancellationToken);
     }

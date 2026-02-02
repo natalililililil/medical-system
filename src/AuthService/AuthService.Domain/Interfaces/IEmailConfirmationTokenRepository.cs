@@ -10,7 +10,7 @@ namespace AuthService.Domain.Interfaces
     public interface IEmailConfirmationTokenRepository
     {
         Task<EmailConfirmationToken?> GetByTokenAsync(string token, CancellationToken cancellationToken);
-        void Add(EmailConfirmationToken token);
+        Task AddAsync(EmailConfirmationToken token);
         Task SaveAsync(CancellationToken cancellationToken);
     }
 }

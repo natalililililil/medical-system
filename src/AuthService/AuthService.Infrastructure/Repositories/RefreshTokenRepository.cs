@@ -11,13 +11,13 @@ namespace AuthService.Infrastructure.Repositories
 
         public RefreshTokenRepository(AuthDbContext dbContext) => _dbContext = dbContext;
 
-        public void Add(RefreshToken token, CancellationToken ct)
-            => _dbContext.RefreshTokens.Add(token);
+        public async Task AddAsync(RefreshToken token, CancellationToken ct)
+            => await _dbContext.RefreshTokens.AddAsync(token);
 
         public async Task<RefreshToken?> GetByTokenAsync(string token, CancellationToken ct)
             => await _dbContext.RefreshTokens.FirstOrDefaultAsync(t => t.Token == token, ct);
 
-        public void Revoke(RefreshToken token, CancellationToken ct)
+        public void Revoke(RefreshToken token)
             => token.Revoke();
         public async Task SaveAsync(CancellationToken ct)
             => await _dbContext.SaveChangesAsync(ct);

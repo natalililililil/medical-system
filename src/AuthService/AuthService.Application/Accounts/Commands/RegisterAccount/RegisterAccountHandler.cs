@@ -24,11 +24,11 @@ namespace AuthService.Application.Accounts.Commands
             var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
             var account = new Account(request.Email, passwordHash);
 
-            _accountRepository.Add(account);
+            await _accountRepository.AddAsync(account);
             await _accountRepository.SaveAsync(cancellationToken);
 
             var emailToken = new EmailConfirmationToken(account.Id);
-            _emailTokenRepository.Add(emailToken);
+            await _emailTokenRepository.AddAsync(emailToken);
             await _emailTokenRepository.SaveAsync(cancellationToken);
 
             Console.WriteLine($"Email confirmation link: http://localhost:5173/confirm-email?token={emailToken.Token}");

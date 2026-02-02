@@ -6,7 +6,7 @@ namespace AuthService.Domain.Interfaces
     {
         Task<Account?> GetByEmailAsync(string email, CancellationToken ct);
         Task<Account?> GetByIdAsync(Guid id, CancellationToken ct);
-        void Add(Account account);
+        Task AddAsync(Account account);
         Task SaveAsync(CancellationToken ct);
     }
 }

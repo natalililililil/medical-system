@@ -31,7 +31,7 @@ namespace AuthService.Application.Accounts.Commands.Login
             var refreshTokenValue = _jwtTokenService.GenerateRefreshToken();
             var refreshToken = new RefreshToken(account.Id, refreshTokenValue, DateTime.UtcNow.AddDays(7));
 
-            _refreshTokenRepository.Add(refreshToken, cancellationToken);
+            await _refreshTokenRepository.AddAsync(refreshToken, cancellationToken);
             await _refreshTokenRepository.SaveAsync(cancellationToken);
 
             return new AuthTokensResponse(accessToken, refreshTokenValue);
