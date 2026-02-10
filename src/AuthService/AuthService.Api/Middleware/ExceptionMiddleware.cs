@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using AuthService.Api.Contracts.Responses;
+using FluentValidation;
 
 namespace AuthService.Api.Middleware;
 
@@ -21,30 +22,30 @@ public class ExceptionMiddleware
         }
         catch (ValidationException ex)
         {
-            context.Response.StatusCode = 400;
-            context.Response.ContentType = "application/json";
+            _logger.LogWarning(ex, "Validation error. Path: {Path}", context.Request.Path);
 
-            await context.Response.WriteAsJsonAsync(new
-            {
-                message = ex.Message
-            });
+            await WriteBadRequest(context);
         }
         catch (InvalidOperationException ex)
         {
-            context.Response.StatusCode = StatusCodes.Status400BadRequest;
-            await context.Response.WriteAsJsonAsync(new
-            {
-                message = ex.Message
-            });
+            _logger.LogWarning(ex, "Business rule violation. Path: {Path}", context.Request.Path);
+
+            await WriteBadRequest(context);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unexpected error occurred. Path: {Path}", context.Request.Path);
+            _logger.LogError(ex, "Unhandled exception. Path: {Path}", context.Request.Path);
+
             context.Response.StatusCode = 500;
-            await context.Response.WriteAsJsonAsync(new
-            {
-                message = "Unexpected server error"
-            });
+            await context.Response.WriteAsJsonAsync(new MessageResponse("Unexpected server error"));
         }
+    }
+
+    private static async Task WriteBadRequest(HttpContext context)
+    {
+        context.Response.StatusCode = StatusCodes.Status400BadRequest;
+        context.Response.ContentType = "application/json";
+
+        await context.Response.WriteAsJsonAsync(new MessageResponse("Invalid request"));
     }
 }
