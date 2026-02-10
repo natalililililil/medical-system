@@ -5,12 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AuthService.Domain.Interfaces
+namespace AuthService.Domain.Interfaces;
+
+public interface IEmailConfirmationTokenRepository
 {
-    public interface IEmailConfirmationTokenRepository
-    {
-        Task<EmailConfirmationToken?> GetByTokenAsync(string token, CancellationToken cancellationToken);
-        Task AddAsync(EmailConfirmationToken token);
-        Task SaveAsync(CancellationToken cancellationToken);
-    }
+    Task<EmailConfirmationToken?> GetByTokenAsync(string token, CancellationToken cancellationToken);
+    Task AddAsync(EmailConfirmationToken token);
+    Task SaveAsync(CancellationToken cancellationToken);
 }

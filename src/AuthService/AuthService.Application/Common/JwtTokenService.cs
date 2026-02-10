@@ -6,47 +6,46 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace AuthService.Application.Common
+namespace AuthService.Application.Common;
+
+public class JwtTokenService : IJwtTokenService
 {
-    public class JwtTokenService : IJwtTokenService
+    private readonly IConfiguration _configuration;
+
+    public JwtTokenService(IConfiguration configuration)
     {
-        private readonly IConfiguration _configuration;
+        _configuration = configuration;
+    }
 
-        public JwtTokenService(IConfiguration configuration)
+    public string GenerateAccessToken(Guid accountId, string email)
+    {
+        var claims = new[]
         {
-            _configuration = configuration;
-        }
+            new Claim(JwtRegisteredClaimNames.Sub, accountId.ToString()),
+            new Claim(JwtRegisteredClaimNames.Email, email),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+        };
 
-        public string GenerateAccessToken(Guid accountId, string email)
-        {
-            var claims = new[]
-            {
-                new Claim(JwtRegisteredClaimNames.Sub, accountId.ToString()),
-                new Claim(JwtRegisteredClaimNames.Email, email),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-            };
+        var jwtSection = _configuration.GetSection("JwtSettings");
+        var key = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(jwtSection["Secret"] ?? throw new InvalidOperationException("JWT Secret not configured"))
+        );
 
-            var jwtSection = _configuration.GetSection("JwtSettings");
-            var key = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(jwtSection["Secret"] ?? throw new InvalidOperationException("JWT Secret not configured"))
-            );
+        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        var token = new JwtSecurityToken(
+            issuer: jwtSection["Issuer"] ?? "AuthService",
+            audience: jwtSection["Audience"] ?? "AuthServiceUsers",
+            claims: claims,
+            expires: DateTime.UtcNow.AddMinutes(int.Parse(jwtSection["AccessTokenExpirationMinutes"] ?? "15")),
+            signingCredentials: creds);
 
-            var token = new JwtSecurityToken(
-                issuer: jwtSection["Issuer"] ?? "AuthService",
-                audience: jwtSection["Audience"] ?? "AuthServiceUsers",
-                claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(int.Parse(jwtSection["AccessTokenExpirationMinutes"] ?? "15")),
-                signingCredentials: creds);
+        return new JwtSecurityTokenHandler().WriteToken(token);
+    }
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
-        }
-
-        public string GenerateRefreshToken()
-        {
-            var bytes = RandomNumberGenerator.GetBytes(64);
-            return Convert.ToBase64String(bytes);
-        }
+    public string GenerateRefreshToken()
+    {
+        var bytes = RandomNumberGenerator.GetBytes(64);
+        return Convert.ToBase64String(bytes);
     }
 }

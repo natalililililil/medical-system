@@ -1,12 +1,11 @@
 ﻿using FluentValidation;
 
-namespace AuthService.Application.Accounts.Commands.ConfirmEmail
+namespace AuthService.Application.Accounts.Commands.ConfirmEmail;
+
+public class ConfirmEmailValidator : AbstractValidator<ConfirmEmailCommand>
 {
-    public class ConfirmEmailValidator : AbstractValidator<ConfirmEmailCommand>
+    public ConfirmEmailValidator()
     {
-        public ConfirmEmailValidator()
-        {
-            RuleFor(x => x.Token).NotEmpty();
-        }
+        RuleFor(x => x.Token).NotEmpty();
     }
 }

@@ -1,8 +1,7 @@
-﻿namespace AuthService.Domain.Interfaces
+﻿namespace AuthService.Domain.Interfaces;
+
+public interface IJwtTokenService
 {
-    public interface IJwtTokenService
-    {
-        string GenerateAccessToken(Guid userId, string email);
-        string GenerateRefreshToken();
-    }
+    string GenerateAccessToken(Guid userId, string email);
+    string GenerateRefreshToken();
 }

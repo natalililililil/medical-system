@@ -2,31 +2,30 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace AuthService.Infrastructure.Persistence.Configurations
+namespace AuthService.Infrastructure.Persistence.Configurations;
+
+public sealed class AccountConfiguration : IEntityTypeConfiguration<Account>
 {
-    public sealed class AccountConfiguration : IEntityTypeConfiguration<Account>
+    public void Configure(EntityTypeBuilder<Account> builder)
     {
-        public void Configure(EntityTypeBuilder<Account> builder)
-        {
-            builder.ToTable("Accounts");
+        builder.ToTable("Accounts");
 
-            builder.HasKey(x => x.Id);
+        builder.HasKey(x => x.Id);
 
-            builder.Property(x => x.Email)
-                .IsRequired()
-                .HasMaxLength(256);
+        builder.Property(x => x.Email)
+            .IsRequired()
+            .HasMaxLength(256);
 
-            builder.HasIndex(x => x.Email)
-                .IsUnique();
+        builder.HasIndex(x => x.Email)
+            .IsUnique();
 
-            builder.Property(x => x.PasswordHash)
-                .IsRequired();
+        builder.Property(x => x.PasswordHash)
+            .IsRequired();
 
-            builder.Property(x => x.Role)
-                .IsRequired();
+        builder.Property(x => x.Role)
+            .IsRequired();
 
-            builder.Property(x => x.CreatedAt)
-                .IsRequired();
-        }
+        builder.Property(x => x.CreatedAt)
+            .IsRequired();
     }
 }

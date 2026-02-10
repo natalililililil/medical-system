@@ -1,9 +1,8 @@
-﻿namespace AuthService.Domain.Accounts
+﻿namespace AuthService.Domain.Accounts;
+
+public enum Role
 {
-    public enum Role
-    {
-        Patient = 0,
-        Doctor = 1,
-        Admin = 2
-    }
+    Patient = 0,
+    Doctor = 1,
+    Admin = 2
 }

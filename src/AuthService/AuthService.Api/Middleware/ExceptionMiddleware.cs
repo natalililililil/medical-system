@@ -1,48 +1,47 @@
 ﻿using FluentValidation;
 
-namespace AuthService.Api.Middleware
+namespace AuthService.Api.Middleware;
+
+public class ExceptionMiddleware
 {
-    public class ExceptionMiddleware
+    private readonly RequestDelegate _next;
+
+    public ExceptionMiddleware(RequestDelegate next)
     {
-        private readonly RequestDelegate _next;
+        _next = next;
+    }
 
-        public ExceptionMiddleware(RequestDelegate next)
+    public async Task Invoke(HttpContext context)
+    {
+        try
         {
-            _next = next;
+            await _next(context);
         }
-
-        public async Task Invoke(HttpContext context)
+        catch (ValidationException ex)
         {
-            try
-            {
-                await _next(context);
-            }
-            catch (ValidationException ex)
-            {
-                context.Response.StatusCode = 400;
-                context.Response.ContentType = "application/json";
+            context.Response.StatusCode = 400;
+            context.Response.ContentType = "application/json";
 
-                await context.Response.WriteAsJsonAsync(new
-                {
-                    message = ex.Message
-                });
-            }
-            catch (InvalidOperationException ex)
+            await context.Response.WriteAsJsonAsync(new
             {
-                context.Response.StatusCode = StatusCodes.Status400BadRequest;
-                await context.Response.WriteAsJsonAsync(new
-                {
-                    message = ex.Message
-                });
-            }
-            catch (Exception ex)
+                message = ex.Message
+            });
+        }
+        catch (InvalidOperationException ex)
+        {
+            context.Response.StatusCode = StatusCodes.Status400BadRequest;
+            await context.Response.WriteAsJsonAsync(new
             {
-                context.Response.StatusCode = 500;
-                await context.Response.WriteAsJsonAsync(new
-                {
-                    message = "Unexpected server error"
-                });
-            }
+                message = ex.Message
+            });
+        }
+        catch (Exception ex)
+        {
+            context.Response.StatusCode = 500;
+            await context.Response.WriteAsJsonAsync(new
+            {
+                message = "Unexpected server error"
+            });
         }
     }
 }
