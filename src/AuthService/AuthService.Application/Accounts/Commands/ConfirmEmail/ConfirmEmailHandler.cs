@@ -1,42 +1,43 @@
-﻿using AuthService.Domain.Interfaces;
+﻿using AuthService.Application.Common.Exceptions;
+using AuthService.Infrastructure.Persistence;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace AuthService.Application.Accounts.Commands.ConfirmEmail;
 
-public class ConfirmEmailHandler : IRequestHandler<ConfirmEmailCommand, Unit>
+public class ConfirmEmailHandler(AuthDbContext context, ILogger<ConfirmEmailHandler> logger) : IRequestHandler<ConfirmEmailCommand, Unit>
 {
-    private readonly IEmailConfirmationTokenRepository _tokenRepository;
-    private readonly IAccountRepository _accountRepository;
-    private readonly ILogger<ConfirmEmailHandler> _logger;
-
-    public ConfirmEmailHandler(IEmailConfirmationTokenRepository tokenRepository, IAccountRepository accountRepository, 
-        ILogger<ConfirmEmailHandler> logger)
-    {
-        _tokenRepository = tokenRepository;
-        _accountRepository = accountRepository;
-        _logger = logger;
-    }
-
     public async Task<Unit> Handle(ConfirmEmailCommand request, CancellationToken ct)
     {
-        var emailToken = await _tokenRepository.GetByTokenAsync(request.Token, ct);
+        var emailToken = await context.EmailConfirmationTokens.FirstOrDefaultAsync(x => x.Token == request.Token, ct);
 
         if (emailToken == null || emailToken.IsUsed || emailToken.IsExpired)
         {
-            _logger.LogWarning("Invalid or expired email confirmation token");
-            throw new InvalidOperationException("Invalid or expired token");
+            logger.LogWarning("Invalid, used or expired email confirmation token");
+            throw new ConflictException("Invalid, used or expired email confirmation token");
         }    
 
-        emailToken.Use();
+        var account = await context.Accounts.FirstOrDefaultAsync(x => x.Id == emailToken.AccountId, ct);
 
-        var account = await _accountRepository.GetByIdAsync(emailToken.AccountId, ct);
+        if (account == null)
+        {
+            logger.LogWarning("Account not found for email confirmation token");
+            throw new NotFoundException("Account not found for email confirmation token");
+        }
+
+        if (account.IsEmailVerified)
+        {
+            logger.LogInformation("Email already confirmed for account {Id}", account.Id);
+            throw new ConflictException("Email already confirmed");
+        }
+
+        emailToken.Use();
         account.ConfirmEmail();
 
-        await _accountRepository.SaveAsync(ct);
-        await _tokenRepository.SaveAsync(ct);
+        await context.SaveChangesAsync(ct);
 
-        _logger.LogInformation("Email confirmed for account {AccountId}", account.Id);
+        logger.LogInformation("Email confirmed for account {AccountId}", account.Id);
         return Unit.Value;
     }
 }
