@@ -1,0 +1,3 @@
+﻿namespace AuthService.Application.Common.Exceptions;
+
+public sealed class ConflictException(string message) : BusinessException(message) { }

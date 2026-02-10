@@ -1,4 +1,5 @@
 ﻿using AuthService.Api.Contracts.Responses;
+using AuthService.Application.Common.Exceptions;
 using FluentValidation;
 
 namespace AuthService.Api.Middleware;
@@ -24,13 +25,13 @@ public class ExceptionMiddleware
         {
             _logger.LogWarning(ex, "Validation error. Path: {Path}", context.Request.Path);
 
-            await WriteBadRequest(context);
+            await WriteBadRequest(context, ex.Message);
         }
-        catch (InvalidOperationException ex)
+        catch (BusinessException ex)
         {
-            _logger.LogWarning(ex, "Business rule violation. Path: {Path}", context.Request.Path);
+            _logger.LogWarning(ex, "Business error. Path: {Path}", context.Request.Path);
 
-            await WriteBadRequest(context);
+            await WriteBadRequest(context, ex.Message);
         }
         catch (Exception ex)
         {
@@ -41,11 +42,11 @@ public class ExceptionMiddleware
         }
     }
 
-    private static async Task WriteBadRequest(HttpContext context)
+    private static async Task WriteBadRequest(HttpContext context, string message)
     {
         context.Response.StatusCode = StatusCodes.Status400BadRequest;
         context.Response.ContentType = "application/json";
 
-        await context.Response.WriteAsJsonAsync(new MessageResponse("Invalid request"));
+        await context.Response.WriteAsJsonAsync(new MessageResponse(message));
     }
 }
