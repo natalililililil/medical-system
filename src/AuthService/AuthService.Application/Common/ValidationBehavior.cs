@@ -31,7 +31,7 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
             if (failures.Count != 0)
             {
                 var errorMessages = string.Join("; ", failures.Select(f => f.ErrorMessage));
-                throw new ValidationException($"Ошибка валидации: {errorMessages}");
+                throw new ValidationException($"Validation error: {errorMessages}");
             }
         }
 

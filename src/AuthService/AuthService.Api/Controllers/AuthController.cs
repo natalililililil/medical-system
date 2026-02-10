@@ -1,4 +1,5 @@
-﻿using AuthService.Application.Accounts.Commands.ConfirmEmail;
+﻿using AuthService.Api.Contracts.Responses;
+using AuthService.Application.Accounts.Commands.ConfirmEmail;
 using AuthService.Application.Accounts.Commands.Login;
 using AuthService.Application.Accounts.Commands.RefreshTokenLogic;
 using AuthService.Application.Accounts.Commands.RegisterAccount;
@@ -6,6 +7,7 @@ using AuthService.Application.Accounts.DTOs;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace AuthService.Api.Controllers;
 
@@ -21,6 +23,7 @@ public class AuthController : ControllerBase
         _logger = logger;
     }
 
+    [EnableRateLimiting("AuthPolicy")]
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
@@ -28,11 +31,10 @@ public class AuthController : ControllerBase
 
         await _mediator.Send(new RegisterAccountCommand(request.Email, request.Password, request.ConfirmPassword));
 
-        _logger.LogInformation("Registration successful for email: {Email}", request.Email);
-
-        return Ok(new { message = "Registration completed successfully" });
+        return Ok(new MessageResponse("Registration completed successfully"));
     }
 
+    [EnableRateLimiting("AuthPolicy")]
     [HttpPost("confirm-email")]
     public async Task<IActionResult> ConfirmEmail([FromBody] ConfirmEmailRequest request)
     {
@@ -40,23 +42,21 @@ public class AuthController : ControllerBase
 
         await _mediator.Send(new ConfirmEmailCommand(request.Token));
 
-        _logger.LogInformation("Email confirmation successful");
-
-        return Ok(new { message = "Email confirmed successfully" });
+        return Ok(new MessageResponse("Email confirmed successfully"));
     }
 
+    [EnableRateLimiting("AuthPolicy")]
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginCommand command)
+    public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        _logger.LogInformation("Login attempt for email: {Email}", command.Email);
+        _logger.LogInformation("Login attempt for email: {Email}", request.Email);
 
-        var result = await _mediator.Send(command);
-
-        _logger.LogInformation("Login successful for email: {Email}", command.Email);
+        var result = await _mediator.Send(new LoginCommand(request.Email, request.Password));
 
         return Ok(result);
     }
 
+    [EnableRateLimiting("RefreshTokenPolicy")]
     [HttpPost("refresh")]
     public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequest request)
     {
@@ -64,15 +64,13 @@ public class AuthController : ControllerBase
 
         var result = await _mediator.Send(new RefreshTokenCommand(request.RefreshToken));
 
-        _logger.LogInformation("Refresh token successful");
-
         return Ok(result);
     }
 
     [HttpGet("protected")]
     [Authorize]
-    public async Task<IActionResult> TestProtected()
+    public IActionResult TestProtected()
     {
-        return Ok(new { message = "eeeeeee!" });
+        return Ok(new MessageResponse("eeeeeee!"));
     }
 }
