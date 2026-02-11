@@ -5,6 +5,7 @@ using AuthService.Application.Common;
 using AuthService.Domain.Interfaces;
 using AuthService.Infrastructure;
 using FluentValidation;
+using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
@@ -18,14 +19,12 @@ builder.Services.AddInfrastructure(builder.Configuration);
 
 builder.Services.AddControllers();
 
-builder.Services.AddValidatorsFromAssemblyContaining<RegisterAccountValidator>();
-builder.Services.AddValidatorsFromAssemblyContaining<ConfirmEmailValidator>();
+builder.Services.AddValidatorsFromAssembly(typeof(RegisterAccountValidator).Assembly);
+builder.Services.AddFluentValidationAutoValidation();
 
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>),typeof(ValidationBehavior<,>));
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
-
-
 
 builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssembly(typeof(RegisterAccountCommand).Assembly));

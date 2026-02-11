@@ -6,6 +6,6 @@ public class ConfirmEmailValidator : AbstractValidator<ConfirmEmailCommand>
 {
     public ConfirmEmailValidator()
     {
-        RuleFor(x => x.Token).NotEmpty();
+        RuleFor(x => x.Token).NotEmpty().WithMessage("Token is required"); ;
     }
 }

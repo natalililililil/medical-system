@@ -1,11 +1,11 @@
 ﻿using AuthService.Application.Common.Validation;
 using FluentValidation;
 
-namespace AuthService.Application.Accounts.Commands.Login;
+namespace AuthService.Application.Accounts.DTOs.Validation;
 
-public class LoginValidator: AbstractValidator<LoginCommand>
+public class RegisterRequestValidator : AbstractValidator<RegisterRequest>
 {
-    public LoginValidator() 
+    public RegisterRequestValidator()
     {
         RuleFor(x => x.Email).ApplyEmailRules();
         RuleFor(x => x.Password).ApplyPasswordRules();
