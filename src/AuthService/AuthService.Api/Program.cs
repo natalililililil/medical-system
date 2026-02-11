@@ -14,10 +14,6 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Logging.ClearProviders();
-builder.Logging.AddConsole();
-builder.Logging.AddDebug();
-
 builder.Services.AddInfrastructure(builder.Configuration);
 
 builder.Services.AddControllers();
