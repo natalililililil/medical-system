@@ -32,10 +32,12 @@ public class ConfirmEmailHandler(AuthDbContext context, ILogger<ConfirmEmailHand
             throw new ConflictException("Email already confirmed");
         }
 
+        await using var transaction = await context.Database.BeginTransactionAsync(ct);
         emailToken.Use();
         account.ConfirmEmail();
 
         await context.SaveChangesAsync(ct);
+        await transaction.CommitAsync(ct);
 
         logger.LogInformation("Email confirmed for account {AccountId}", account.Id);
         return Unit.Value;
