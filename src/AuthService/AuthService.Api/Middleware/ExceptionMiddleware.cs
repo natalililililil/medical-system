@@ -21,32 +21,23 @@ public class ExceptionMiddleware
         {
             await _next(context);
         }
-        catch (ValidationException ex)
-        {
-            _logger.LogWarning(ex, "Validation error. Path: {Path}", context.Request.Path);
-
-            await WriteBadRequest(context, ex.Message);
-        }
-        catch (BusinessException ex)
-        {
-            _logger.LogWarning(ex, "Business error. Path: {Path}", context.Request.Path);
-
-            await WriteBadRequest(context, ex.Message);
-        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Unhandled exception. Path: {Path}", context.Request.Path);
+            var (statusCode, message, logLevel) = ex switch
+            {
+                ValidationException => (400, ex.Message, LogLevel.Warning),
+                NotFoundException => (404, "Resource not found", LogLevel.Warning),
+                ConflictException => (409, "Operation cannot be completed", LogLevel.Warning),
+                BusinessException => (400, "Business logic error", LogLevel.Warning),
+                _ => (500, "Unexpected server error", LogLevel.Error)
+            };
 
-            context.Response.StatusCode = 500;
-            await context.Response.WriteAsJsonAsync(new MessageResponse("Unexpected server error"));
+            _logger.Log(logLevel, ex, "Error. Path: {Path}", context.Request.Path);
+
+            context.Response.StatusCode = statusCode;
+            context.Response.ContentType = "application/json";
+
+            await context.Response.WriteAsJsonAsync(new MessageResponse(message));
         }
-    }
-
-    private static async Task WriteBadRequest(HttpContext context, string message)
-    {
-        context.Response.StatusCode = StatusCodes.Status400BadRequest;
-        context.Response.ContentType = "application/json";
-
-        await context.Response.WriteAsJsonAsync(new MessageResponse(message));
     }
 }
