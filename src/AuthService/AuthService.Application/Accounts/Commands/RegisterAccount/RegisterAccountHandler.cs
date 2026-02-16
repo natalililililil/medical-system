@@ -1,46 +1,41 @@
 ﻿using AuthService.Application.Accounts.Commands.RegisterAccount;
+using AuthService.Application.Common.Exceptions;
 using AuthService.Domain.Accounts;
 using AuthService.Domain.Interfaces;
 using AuthService.Domain.Tokens;
+using AuthService.Infrastructure.Persistence;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace AuthService.Application.Accounts.Commands;
 
-public class RegisterAccountHandler : IRequestHandler<RegisterAccountCommand, Unit>
+public class RegisterAccountHandler(AuthDbContext context, ILogger<RegisterAccountHandler> logger) : IRequestHandler<RegisterAccountCommand, Unit>
 {
-    private readonly IAccountRepository _accountRepository;
-    private readonly IEmailConfirmationTokenRepository _emailTokenRepository;
-    private readonly ILogger<RegisterAccountHandler> _logger;
-    public RegisterAccountHandler(IAccountRepository accountRepository, IEmailConfirmationTokenRepository emailTokenRepository, 
-        ILogger<RegisterAccountHandler> logger)
+    public async Task<Unit> Handle(RegisterAccountCommand request, CancellationToken ct)
     {
-        _accountRepository = accountRepository;
-        _emailTokenRepository = emailTokenRepository;
-        _logger = logger;
-    }
-
-    public async Task<Unit> Handle(RegisterAccountCommand request, CancellationToken cancellationToken)
-    {
-        if (await _accountRepository.GetByEmailAsync(request.Email, cancellationToken) != null)
+        if (await context.Accounts.FirstOrDefaultAsync(a => a.Email == request.Email, ct) != null)
         {
-            _logger.LogWarning("Attempt to register with an email that already exists: {Email}", request.Email);
-            throw new InvalidOperationException("An account with this email already exists");
+            logger.LogWarning("Attempt to register with an email that already exists: {Email}", request.Email);
+            throw new ConflictException("An account with this email already exists");
         }
 
         var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
         var account = new Account(request.Email, passwordHash);
 
-        await _accountRepository.AddAsync(account);
-        await _accountRepository.SaveAsync(cancellationToken);
+        await using var transaction = await context.Database.BeginTransactionAsync(ct);
+
+        await context.Accounts.AddAsync(account, ct);
 
         var emailToken = new EmailConfirmationToken(account.Id);
-        await _emailTokenRepository.AddAsync(emailToken);
-        await _emailTokenRepository.SaveAsync(cancellationToken);
+        await context.EmailConfirmationTokens.AddAsync(emailToken, ct);
+
+        await context.SaveChangesAsync(ct);
+        await transaction.CommitAsync(ct);
 
         Console.WriteLine($"Email confirmation link: http://localhost:5173/confirm-email?token={emailToken.Token}");
 
-        _logger.LogInformation("New account registered with email: {Email}", request.Email);
+        logger.LogInformation("New account registered with email: {Email}", request.Email);
         return Unit.Value;
     }
 }
