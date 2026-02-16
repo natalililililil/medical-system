@@ -29,8 +29,10 @@ public class LoginHandler(AuthDbContext context, IJwtTokenService jwtTokenServic
         
         await using var transaction = await context.Database.BeginTransactionAsync(ct);
 
-        var oldTokens = context.RefreshTokens.Where(t => t.AccountId == account.Id);
-        context.RefreshTokens.RemoveRange(oldTokens);
+        var oldTokens = context.RefreshTokens.Where(t => t.AccountId == account.Id && t.IsActive);
+
+        foreach (var token in oldTokens)
+            token.Revoke();
 
         var accessToken = jwtTokenService.GenerateAccessToken(account.Id, account.Email);
         var refreshTokenValue = jwtTokenService.GenerateRefreshToken();

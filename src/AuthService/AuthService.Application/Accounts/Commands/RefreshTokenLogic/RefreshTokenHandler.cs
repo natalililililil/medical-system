@@ -1,58 +1,55 @@
 ﻿using AuthService.Application.Accounts.DTOs;
-using AuthService.Domain.Interfaces;
+using AuthService.Application.Common.Exceptions;
 using AuthService.Domain.Accounts;
+using AuthService.Domain.Interfaces;
+using AuthService.Infrastructure.Persistence;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace AuthService.Application.Accounts.Commands.RefreshTokenLogic;
 
-public class RefreshTokenHandler : IRequestHandler<RefreshTokenCommand, AuthTokensResponse>
+public class RefreshTokenHandler(AuthDbContext context, IJwtTokenService jwt, ILogger<RefreshTokenHandler> logger) : IRequestHandler<RefreshTokenCommand, AuthTokensResponse>
 {
-    private readonly IRefreshTokenRepository _refreshRepository;
-    private readonly IAccountRepository _accountRepository;
-    private readonly IJwtTokenService _jwt;
-    private readonly ILogger<RefreshTokenHandler> _logger;
-
-    public RefreshTokenHandler(IRefreshTokenRepository refreshRepo, IAccountRepository accountRepo, IJwtTokenService jwt, 
-        ILogger<RefreshTokenHandler> logger)
-    {
-        _refreshRepository = refreshRepo;
-        _accountRepository = accountRepo;
-        _jwt = jwt;
-        _logger = logger;
-    }
-
     public async Task<AuthTokensResponse> Handle(RefreshTokenCommand request, CancellationToken ct)
     {
-        var refresh = await _refreshRepository.GetByTokenAsync(request.RefreshToken, ct);
+        var refresh = await context.RefreshTokens.FirstOrDefaultAsync(rt => rt.Token == request.RefreshToken, ct);
 
         if (refresh == null || !refresh.IsActive)
         {
-            _logger.LogWarning("Invalid refresh token used");
-            throw new InvalidOperationException("Invalid refresh token");
+            logger.LogWarning("Invalid refresh token used");
+            throw new ConflictException("Invalid refresh token");
         }
 
-        var account = await _accountRepository.GetByIdAsync(refresh.AccountId, ct);
+        if (refresh.ExpiresAt <= DateTime.UtcNow)
+        {
+            logger.LogWarning("Expired refresh token used");
+            throw new ConflictException("Refresh token expired");
+        }
+        var account = await context.Accounts.FirstOrDefaultAsync(a => a.Id == refresh.AccountId, ct);
 
         if (account == null)
-            throw new InvalidOperationException("Account not found");
+            throw new UnauthorizedException("Account not found");
+
+        await using var transaction = await context.Database.BeginTransactionAsync(ct);
 
         refresh.Revoke();
 
-        var newRefreshValue = _jwt.GenerateRefreshToken();
+        var newRefreshValue = jwt.GenerateRefreshToken();
         var newRefresh = new RefreshToken(
             account.Id,
             newRefreshValue,
             DateTime.UtcNow.AddDays(7)
         );
 
-        await _refreshRepository.AddAsync(newRefresh, ct);
+        context.RefreshTokens.Add(newRefresh);
 
-        var access = _jwt.GenerateAccessToken(account.Id, account.Email);
+        var access = jwt.GenerateAccessToken(account.Id, account.Email);
 
-        await _refreshRepository.SaveAsync(ct);
+        await context.SaveChangesAsync(ct);
+        await transaction.CommitAsync(ct);
 
-        _logger.LogInformation("Refresh token successfully used for account {AccountId}", account.Id);
+        logger.LogInformation("Refresh token successfully used for account {AccountId}", account.Id);
 
         return new AuthTokensResponse(access, newRefreshValue);
     }
