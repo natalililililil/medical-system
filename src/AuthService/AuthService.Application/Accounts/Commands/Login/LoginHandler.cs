@@ -29,22 +29,23 @@ public class LoginHandler(AuthDbContext context, IJwtTokenService jwtTokenServic
         
         await using var transaction = await context.Database.BeginTransactionAsync(ct);
 
-        var oldTokens = context.RefreshTokens.Where(t => t.AccountId == account.Id && t.IsActive);
+        var oldTokens = await context.RefreshTokens.Where(t => t.AccountId == account.Id && t.RevokedAt == null).ToListAsync(ct);
 
         foreach (var token in oldTokens)
             token.Revoke();
+        logger.LogInformation("Revoked {Count} old tokens for account {Email}", oldTokens.Count, request.Email);
 
         var accessToken = jwtTokenService.GenerateAccessToken(account.Id, account.Email);
-        var refreshTokenValue = jwtTokenService.GenerateRefreshToken();
-        var refreshToken = new RefreshToken(account.Id, refreshTokenValue, DateTime.UtcNow.AddDays(7));
+        var newRefreshTokenValue = jwtTokenService.GenerateRefreshToken();
+        var newRefreshToken = new RefreshToken(account.Id, newRefreshTokenValue, DateTime.UtcNow.AddDays(7));
 
-        context.RefreshTokens.Add(refreshToken);
+        context.RefreshTokens.Add(newRefreshToken);
 
         await context.SaveChangesAsync(ct);
         await transaction.CommitAsync(ct);
 
         logger.LogInformation("User logged in successfully: {Email}", request.Email);
 
-        return new AuthTokensResponse(accessToken, refreshTokenValue);
+        return new AuthTokensResponse(accessToken, newRefreshTokenValue);
     }
 }
