@@ -1,5 +1,4 @@
 using AuthService.Api.Middleware;
-using AuthService.Application.Accounts.Commands.ConfirmEmail;
 using AuthService.Application.Accounts.Commands.RegisterAccount;
 using AuthService.Application.Common;
 using AuthService.Domain.Interfaces;

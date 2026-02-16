@@ -1,6 +1,4 @@
-﻿using AuthService.Domain.Interfaces;
-using AuthService.Infrastructure.Persistence;
-using AuthService.Infrastructure.Repositories;
+﻿using AuthService.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,10 +12,6 @@ public static class DependencyInjection
         services.AddDbContext<AuthDbContext>(options =>
             options.UseSqlServer(
                 configuration.GetConnectionString("AuthDb")));
-
-        services.AddScoped<IAccountRepository, AccountRepository>();
-        services.AddScoped<IEmailConfirmationTokenRepository, EmailConfirmationTokenRepository>();
-        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
         return services;
     }
