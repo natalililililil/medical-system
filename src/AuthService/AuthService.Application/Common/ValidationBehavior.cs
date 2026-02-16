@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using FluentValidation.Results;
 using MediatR;
 
 namespace AuthService.Application.Common;
@@ -15,13 +16,17 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
 
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
     {
-        if (_validators.Any())
+        if (_validators is not null)
         {
             var context = new ValidationContext<TRequest>(request);
 
-            var validationResults = await Task.WhenAll(
-                _validators.Select(v => v.ValidateAsync(context, cancellationToken))
-            );
+            var validationResults = new List<ValidationResult>();
+
+            foreach(var validator in _validators)
+            {
+                var result = await validator.ValidateAsync(context, cancellationToken).ConfigureAwait(false);
+                validationResults.Add(result);
+            }
 
             var failures = validationResults
                 .SelectMany(r => r.Errors)
