@@ -1,10 +1,11 @@
 ﻿using AuthService.Domain.Accounts;
+using AuthService.Application.Common.Interfaces;
 using AuthService.Domain.Tokens;
 using Microsoft.EntityFrameworkCore;
 
 namespace AuthService.Infrastructure.Persistence;
 
-public class AuthDbContext: DbContext
+public class AuthDbContext: DbContext, IAuthDbContext
 {
     public AuthDbContext(DbContextOptions<AuthDbContext> options) : base(options) { }
 

@@ -5,6 +5,7 @@ using System.Diagnostics;
 namespace AuthService.Application.Common;
 
 public class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+        where TRequest : IRequest<TResponse>
 {
     private readonly ILogger<LoggingBehavior<TRequest, TResponse>> _logger;
     public LoggingBehavior(ILogger<LoggingBehavior<TRequest, TResponse>> logger)

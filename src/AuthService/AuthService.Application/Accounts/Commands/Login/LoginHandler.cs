@@ -1,15 +1,15 @@
 ﻿using AuthService.Application.Accounts.DTOs;
 using AuthService.Application.Common.Exceptions;
+using AuthService.Application.Common.Interfaces;
 using AuthService.Domain.Accounts;
 using AuthService.Domain.Interfaces;
-using AuthService.Infrastructure.Persistence;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace AuthService.Application.Accounts.Commands.Login;
 
-public class LoginHandler(AuthDbContext context, IJwtTokenService jwtTokenService, ILogger<LoginHandler> logger) : IRequestHandler<LoginCommand, AuthTokensResponse>
+public class LoginHandler(IAuthDbContext context, IJwtTokenService jwtTokenService, ILogger<LoginHandler> logger) : IRequestHandler<LoginCommand, AuthTokensResponse>
 {
     public async Task<AuthTokensResponse> Handle(LoginCommand request, CancellationToken ct)
     {
@@ -26,8 +26,6 @@ public class LoginHandler(AuthDbContext context, IJwtTokenService jwtTokenServic
             logger.LogWarning("Login attempt with unverified email: {Email}", request.Email);
             throw new ConflictException("Email is not confirmed");
         }
-        
-        await using var transaction = await context.Database.BeginTransactionAsync(ct);
 
         var oldTokens = await context.RefreshTokens.Where(t => t.AccountId == account.Id && t.RevokedAt == null).ToListAsync(ct);
 
@@ -40,9 +38,6 @@ public class LoginHandler(AuthDbContext context, IJwtTokenService jwtTokenServic
         var newRefreshToken = new RefreshToken(account.Id, newRefreshTokenValue, DateTime.UtcNow.AddDays(7));
 
         context.RefreshTokens.Add(newRefreshToken);
-
-        await context.SaveChangesAsync(ct);
-        await transaction.CommitAsync(ct);
 
         logger.LogInformation("User logged in successfully: {Email}", request.Email);
 

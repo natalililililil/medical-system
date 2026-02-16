@@ -1,12 +1,12 @@
 ﻿using AuthService.Application.Common.Exceptions;
-using AuthService.Infrastructure.Persistence;
+using AuthService.Application.Common.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace AuthService.Application.Accounts.Commands.ConfirmEmail;
 
-public class ConfirmEmailHandler(AuthDbContext context, ILogger<ConfirmEmailHandler> logger) : IRequestHandler<ConfirmEmailCommand, Unit>
+public class ConfirmEmailHandler(IAuthDbContext context, ILogger<ConfirmEmailHandler> logger) : IRequestHandler<ConfirmEmailCommand, Unit>
 {
     public async Task<Unit> Handle(ConfirmEmailCommand request, CancellationToken ct)
     {
@@ -32,12 +32,8 @@ public class ConfirmEmailHandler(AuthDbContext context, ILogger<ConfirmEmailHand
             throw new ConflictException("Email already confirmed");
         }
 
-        await using var transaction = await context.Database.BeginTransactionAsync(ct);
         emailToken.Use();
         account.ConfirmEmail();
-
-        await context.SaveChangesAsync(ct);
-        await transaction.CommitAsync(ct);
 
         logger.LogInformation("Email confirmed for account {AccountId}", account.Id);
         return Unit.Value;

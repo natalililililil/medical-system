@@ -1,15 +1,15 @@
 ﻿using AuthService.Application.Accounts.DTOs;
 using AuthService.Application.Common.Exceptions;
+using AuthService.Application.Common.Interfaces;
 using AuthService.Domain.Accounts;
 using AuthService.Domain.Interfaces;
-using AuthService.Infrastructure.Persistence;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace AuthService.Application.Accounts.Commands.RefreshTokenLogic;
 
-public class RefreshTokenHandler(AuthDbContext context, IJwtTokenService jwt, ILogger<RefreshTokenHandler> logger) : IRequestHandler<RefreshTokenCommand, AuthTokensResponse>
+public class RefreshTokenHandler(IAuthDbContext context, IJwtTokenService jwt, ILogger<RefreshTokenHandler> logger) : IRequestHandler<RefreshTokenCommand, AuthTokensResponse>
 {
     public async Task<AuthTokensResponse> Handle(RefreshTokenCommand request, CancellationToken ct)
     {
@@ -31,8 +31,6 @@ public class RefreshTokenHandler(AuthDbContext context, IJwtTokenService jwt, IL
         if (account == null)
             throw new UnauthorizedException("Account not found");
 
-        await using var transaction = await context.Database.BeginTransactionAsync(ct);
-
         refresh.Revoke();
 
         var newRefreshValue = jwt.GenerateRefreshToken();
@@ -45,9 +43,6 @@ public class RefreshTokenHandler(AuthDbContext context, IJwtTokenService jwt, IL
         context.RefreshTokens.Add(newRefresh);
 
         var access = jwt.GenerateAccessToken(account.Id, account.Email);
-
-        await context.SaveChangesAsync(ct);
-        await transaction.CommitAsync(ct);
 
         logger.LogInformation("Refresh token successfully used for account {AccountId}", account.Id);
 

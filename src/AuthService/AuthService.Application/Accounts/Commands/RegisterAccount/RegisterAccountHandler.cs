@@ -1,16 +1,16 @@
 ﻿using AuthService.Application.Accounts.Commands.RegisterAccount;
 using AuthService.Application.Common.Exceptions;
+using AuthService.Application.Common.Interfaces;
 using AuthService.Domain.Accounts;
 using AuthService.Domain.Interfaces;
 using AuthService.Domain.Tokens;
-using AuthService.Infrastructure.Persistence;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace AuthService.Application.Accounts.Commands;
 
-public class RegisterAccountHandler(AuthDbContext context, ILogger<RegisterAccountHandler> logger) : IRequestHandler<RegisterAccountCommand, Unit>
+public class RegisterAccountHandler(IAuthDbContext context, ILogger<RegisterAccountHandler> logger) : IRequestHandler<RegisterAccountCommand, Unit>
 {
     public async Task<Unit> Handle(RegisterAccountCommand request, CancellationToken ct)
     {
@@ -23,15 +23,10 @@ public class RegisterAccountHandler(AuthDbContext context, ILogger<RegisterAccou
         var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
         var account = new Account(request.Email, passwordHash);
 
-        await using var transaction = await context.Database.BeginTransactionAsync(ct);
-
         await context.Accounts.AddAsync(account, ct);
 
         var emailToken = new EmailConfirmationToken(account.Id);
         await context.EmailConfirmationTokens.AddAsync(emailToken, ct);
-
-        await context.SaveChangesAsync(ct);
-        await transaction.CommitAsync(ct);
 
         Console.WriteLine($"Email confirmation link: http://localhost:5173/confirm-email?token={emailToken.Token}");
 
