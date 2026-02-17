@@ -1,3 +1,3 @@
 ﻿namespace AuthService.Application.Common.Exceptions;
 
-public sealed class UnauthorizedException(string message) : BusinessException(message) { }
+public sealed class UnauthorizedException(string errorCode, string message) : BusinessException(errorCode, message) { }

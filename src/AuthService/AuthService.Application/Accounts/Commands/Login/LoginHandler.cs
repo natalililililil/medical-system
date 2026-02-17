@@ -18,13 +18,13 @@ public class LoginHandler(IAuthDbContext context, IJwtTokenService jwtTokenServi
         if (account == null || !BCrypt.Net.BCrypt.Verify(request.Password, account.PasswordHash))
         { 
             logger.LogWarning("Failed login attempt for email: {Email}", request.Email);
-            throw new UnauthorizedException("Either an email or a password is incorrect");
+            throw new UnauthorizedException("INVALID_EMAIL_OR_PASSWORD", "Either an email or a password is incorrect");
         }
 
         if (!account.IsEmailVerified)
         {
             logger.LogWarning("Login attempt with unverified email: {Email}", request.Email);
-            throw new ConflictException("Email is not confirmed");
+            throw new ConflictException("EMAIL_NOT_VERIFIED", "Email is not confirmed");
         }
 
         var oldTokens = await context.RefreshTokens.Where(t => t.AccountId == account.Id && t.RevokedAt == null).ToListAsync(ct);

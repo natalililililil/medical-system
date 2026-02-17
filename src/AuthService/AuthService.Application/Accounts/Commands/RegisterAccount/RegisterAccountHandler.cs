@@ -17,7 +17,7 @@ public class RegisterAccountHandler(IAuthDbContext context, ILogger<RegisterAcco
         if (await context.Accounts.FirstOrDefaultAsync(a => a.Email == request.Email, ct) != null)
         {
             logger.LogWarning("Attempt to register with an email that already exists: {Email}", request.Email);
-            throw new ConflictException("An account with this email already exists");
+            throw new ConflictException("EMAIL_ALREADY_CONFIRMED", "An account with this email already exists");
         }
 
         var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);

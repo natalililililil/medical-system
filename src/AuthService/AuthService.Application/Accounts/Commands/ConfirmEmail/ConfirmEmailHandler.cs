@@ -15,7 +15,7 @@ public class ConfirmEmailHandler(IAuthDbContext context, ILogger<ConfirmEmailHan
         if (emailToken == null || emailToken.IsUsed || emailToken.IsExpired)
         {
             logger.LogWarning("Invalid, used or expired email confirmation token");
-            throw new ConflictException("Invalid, used or expired email confirmation token");
+            throw new ConflictException("INVALID_EMAIL_CONFIRMATION", "Invalid, used or expired email confirmation token");
         }    
 
         var account = await context.Accounts.FirstOrDefaultAsync(x => x.Id == emailToken.AccountId, ct);
@@ -23,13 +23,13 @@ public class ConfirmEmailHandler(IAuthDbContext context, ILogger<ConfirmEmailHan
         if (account == null)
         {
             logger.LogWarning("Account not found for email confirmation token");
-            throw new NotFoundException("Account not found for email confirmation token");
+            throw new UnauthorizedException("INVALID_EMAIL_CONFIRMATION", "Account not found for email confirmation token");
         }
 
         if (account.IsEmailVerified)
         {
             logger.LogInformation("Email already confirmed for account {Id}", account.Id);
-            throw new ConflictException("Email already confirmed");
+            throw new ConflictException("EMAIL_ALREADY_CONFIRMED", "Email already confirmed");
         }
 
         emailToken.Use();

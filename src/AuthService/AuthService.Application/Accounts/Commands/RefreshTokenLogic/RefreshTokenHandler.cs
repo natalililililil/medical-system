@@ -18,18 +18,18 @@ public class RefreshTokenHandler(IAuthDbContext context, IJwtTokenService jwt, I
         if (refresh == null || !refresh.IsActive)
         {
             logger.LogWarning("Invalid refresh token used");
-            throw new ConflictException("Invalid refresh token");
+            throw new ConflictException("INVALID_REFRESH_TOKEN", "Invalid refresh token");
         }
 
         if (refresh.ExpiresAt <= DateTime.UtcNow)
         {
             logger.LogWarning("Expired refresh token used");
-            throw new ConflictException("Refresh token expired");
+            throw new ConflictException("INVALID_REFRESH_TOKEN", "Refresh token expired");
         }
         var account = await context.Accounts.FirstOrDefaultAsync(a => a.Id == refresh.AccountId, ct);
 
         if (account == null)
-            throw new UnauthorizedException("Account not found");
+            throw new UnauthorizedException("INVALID_REFRESH_TOKEN", "Account not found");
 
         refresh.Revoke();
 

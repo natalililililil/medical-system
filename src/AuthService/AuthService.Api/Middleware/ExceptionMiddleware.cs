@@ -24,23 +24,27 @@ public class ExceptionMiddleware
         }
         catch (Exception ex)
         {
-            var (statusCode, message, logLevel) = ex switch
-            {
-                ValidationException => (400, ex.Message, LogLevel.Warning),
-                UnauthorizedException => (401, ex.Message, LogLevel.Warning),
-                NotFoundException => (404, "Resource not found", LogLevel.Warning),
-                ConflictException => (409, "Operation cannot be completed", LogLevel.Warning),
-                BusinessException => (400, "Business logic error", LogLevel.Warning),
-                DbUpdateException => (500, "Database update error", LogLevel.Error),
-                _ => (500, "Unexpected server error", LogLevel.Error)
-            };
+            var response = MapException(ex);
 
-            _logger.Log(logLevel, ex, "Error. Path: {Path}", context.Request.Path);
+            _logger.Log(response.LogLevel, ex, "Error. Code: {Code}. Path: {Path}", response.Code, context.Request.Path);
 
-            context.Response.StatusCode = statusCode;
+            context.Response.StatusCode = response.StatusCode;
             context.Response.ContentType = "application/json";
 
-            await context.Response.WriteAsJsonAsync(new MessageResponse(message));
+            await context.Response.WriteAsJsonAsync(new ErrorResponse(response.Code, response.Message));
         }
+    }
+
+    private static (int StatusCode, string Code, string Message, LogLevel LogLevel) MapException(Exception ex)
+    {
+        return ex switch
+        {
+            ValidationException => (400, "VALIDATION_ERROR", ex.Message, LogLevel.Warning),
+            UnauthorizedException ue => (401, ue.ErrorCode, "Unauthorized", LogLevel.Warning),
+            NotFoundException ne => (404, ne.ErrorCode, "Resource not found", LogLevel.Warning),
+            ConflictException ce => (409, ce.ErrorCode, "Operation cannot be completed", LogLevel.Warning),
+            DbUpdateException => (500, "DATABASE_ERROR", "Internal server error", LogLevel.Error),
+            _ => (500, "UNEXPECTED_ERROR", "Internal server error", LogLevel.Error)
+        };
     }
 }
