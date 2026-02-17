@@ -62,7 +62,7 @@ export default function RegisterModal({ onSuccess, onClose }) {
       <button className="close-button" onClick={onClose}>×</button>
 
       <form onSubmit={handleSubmit}>
-        <h2>Регистрация</h2>
+        <h2>Sign Up</h2>
 
         <input
           name="email"
@@ -79,7 +79,7 @@ export default function RegisterModal({ onSuccess, onClose }) {
         <input
           type="password"
           name="password"
-          placeholder="Пароль"
+          placeholder="Password"
           value={values.password}
           onChange={handleChange}
           onBlur={handleBlur}
@@ -92,7 +92,7 @@ export default function RegisterModal({ onSuccess, onClose }) {
         <input
           type="password"
           name="confirmPassword"
-          placeholder="Повторите пароль"
+          placeholder="Confirm password"
           value={values.confirmPassword}
           onChange={handleChange}
           onBlur={handleBlur}
@@ -111,7 +111,7 @@ export default function RegisterModal({ onSuccess, onClose }) {
         )}
 
         <button type="submit" disabled={!isValid}>
-          Зарегистрироваться
+          Sign up
         </button>
       </form>
     </div>

@@ -17,10 +17,10 @@ function Home() {
 
         <div>
           <button className="register-button" onClick={() => setShowLogin(true)}>
-            Войти
+            Sign in
           </button>
           <button className="register-button" onClick={() => setShowRegister(true)}>
-            Зарегистрироваться
+            Sign up
           </button>
         </div>
       </div>
@@ -42,8 +42,8 @@ function Home() {
       {showConfirm && (
         <div className="modal">
           <button className="close-button" onClick={() => setShowConfirm(false)}>×</button>
-          <h2>Мы отправили письмо на вашу почту.</h2>
-          <p>Перейдите по ссылке из письма, чтобы подтвердить регистрацию.</p>
+          <h2>We have sent a confirmation email.</h2>
+          <p>Please click the link in the email to complete your registration.</p>
         </div>
       )}
     </div>

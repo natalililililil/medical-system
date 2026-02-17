@@ -1,27 +1,28 @@
 import { useEffect, useState } from "react";
 import { confirmEmail } from "../api/auth";
+import { errorMessages } from "../constants/errorMessages";
 import "../App.css";
 
 export default function ConfirmEmail() {
-  const [message, setMessage] = useState("Подтверждаем email...");
+  const [message, setMessage] = useState("Confirming email...");
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const token = params.get("token");
 
     if (!token) {
-      setMessage("Токен не найден");
+      setMessage("Token not found");
       return;
     }
 
     confirmEmail(token)
-      .then(() => setMessage("Email успешно подтвержден!"))
-      .catch(() => setMessage("Ссылка недействительна или токен истёк"));
+      .then(() => setMessage("Email successfully confirmed!"))
+      .catch((err) => setMessage(err.message || errorMessages.INVALID_EMAIL_CONFIRMATION));
   }, []);
 
   return (
     <div className="modal">
-      <h2>Подтверждение email</h2>
+      <h2>Email Confirmation</h2>
       <p>{message}</p>
     </div>
   );

@@ -40,7 +40,7 @@ export default function LoginModal({ onClose }) {
 
     try {
       await login(values);
-      setSuccessMessage("Вы успешно вошли!");
+      setSuccessMessage("Successfully logged in!");
       setTimeout(() => onClose(), 1500);
     } catch (err) {
       setServerError(err.message);
@@ -51,7 +51,7 @@ export default function LoginModal({ onClose }) {
     <div className="modal">
       <button className="close-button" onClick={onClose}>×</button>
       <form onSubmit={handleSubmit}>
-        <h2>Вход</h2>
+        <h2>Sign In</h2>
 
         <input
           name="email"
@@ -66,7 +66,7 @@ export default function LoginModal({ onClose }) {
         <input
           type="password"
           name="password"
-          placeholder="Пароль"
+          placeholder="Password"
           value={values.password}
           onChange={handleChange}
           onBlur={handleBlur}
@@ -77,7 +77,7 @@ export default function LoginModal({ onClose }) {
         {serverError && <p className="error-message">{serverError}</p>}
         {successMessage && <p style={{ color: "green", marginBottom: "10px" }}>{successMessage}</p>}
 
-        <button type="submit" disabled={!isValid}>Войти</button>
+        <button type="submit" disabled={!isValid}>Sign In</button>
       </form>
     </div>
   );
