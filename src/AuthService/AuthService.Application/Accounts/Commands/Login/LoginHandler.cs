@@ -18,7 +18,7 @@ public class LoginHandler(IAuthDbContext context, IJwtTokenService jwtTokenServi
         if (account == null || !BCrypt.Net.BCrypt.Verify(request.Password, account.PasswordHash))
         { 
             logger.LogWarning("Failed login attempt for email: {Email}", request.Email);
-            throw new UnauthorizedException("INVALID_EMAIL_OR_PASSWORD", "Either an email or a password is incorrect");
+            throw new UnauthorizedException("INVALID_CREDENTIALS", "Either an email or a password is incorrect");
         }
 
         if (!account.IsEmailVerified)

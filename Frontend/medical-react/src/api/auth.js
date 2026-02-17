@@ -1,5 +1,23 @@
+import { errorMessages } from "../constants/errorMessages";
+
 const API_URL = "https://localhost:7117/api/auth";
 window.fetchWithAuth = fetchWithAuth;
+
+export async function handleApiResponse(response) {
+  let result = null;
+  try {
+    result = await response.json();
+  } catch (e) {
+    throw new Error("Server returned invalid response");
+  }
+
+  if (!response.ok) {
+    const message = errorMessages[result?.code] || result?.message || "Request failed";
+    throw new Error(message);
+  }
+
+  return result;
+}
 
 export async function register(data) {
   const response = await fetch(`${API_URL}/register`, {
@@ -8,20 +26,7 @@ export async function register(data) {
     body: JSON.stringify(data)
   });
 
-  const result = await response.json();
-
-  if (!response.ok) {
-    if (result.message) {
-      throw new Error(result.message);
-    }
-
-    if (result.errors) {
-      const firstError = Object.values(result.errors)[0][0];
-      throw new Error(firstError);
-    }
-
-    throw new Error("Registration failed");
-  }
+  return handleApiResponse(response);
 }
 
 export async function confirmEmail(token) {
@@ -31,9 +36,7 @@ export async function confirmEmail(token) {
     body: JSON.stringify({ token })
   });
 
-  if (!response.ok) {
-    throw new Error("Email confirmation error");
-  }
+  return handleApiResponse(response);
 }
 
 export function saveTokens({ accessToken, refreshToken }) {
@@ -61,11 +64,7 @@ export async function login(data) {
     body: JSON.stringify(data)
   });
 
-  const result = await response.json();
-
-  if (!response.ok) {
-    throw new Error(result.message || "Login failed");
-  }
+  const result = await handleApiResponse(response);
 
   saveTokens(result);
   return result;
@@ -86,7 +85,7 @@ export async function refreshAccessToken() {
     return null;
   }
 
-  const result = await response.json();
+  const result = await handleApiResponse(response);
   saveTokens(result);
   return result.accessToken;
 }
@@ -115,16 +114,5 @@ export async function fetchWithAuth(url, options = {}) {
     response = await fetch(url, { ...options, headers: retryHeaders });
   }
 
-  let result = null;
-  try {
-    result = await response.json();
-  } catch (e) {
-  }
-
-  if (!response.ok) {
-    const message = result?.message || "Request failed";
-    throw new Error(message);
-  }
-
-  return result;
+  return handleApiResponse(response);
 }
