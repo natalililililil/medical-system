@@ -1,0 +1,5 @@
+﻿using MediatR;
+
+namespace AuthService.Application.Common.Interfaces;
+
+public interface ICommand<out TResponse> : IRequest<TResponse> { }

@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 namespace AuthService.Application.Common;
 
 public class TransactionBehavior<TRequest, TResponse>(IAuthDbContext context) : IPipelineBehavior<TRequest, TResponse>
-    where TRequest : IRequest<TResponse>
+    where TRequest : ICommand<TResponse>
 {
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
     {
