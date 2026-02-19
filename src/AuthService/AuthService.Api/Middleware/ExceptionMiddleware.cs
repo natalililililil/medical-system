@@ -1,4 +1,5 @@
 ﻿using AuthService.Api.Contracts.Responses;
+using AuthService.Api.Services.Cookies;
 using AuthService.Application.Common.Exceptions;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,7 @@ public class ExceptionMiddleware
 {
     private readonly RequestDelegate _next;
     private readonly ILogger<ExceptionMiddleware> _logger;
+    private readonly ITokenCookieService _cookieService;
 
     public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
     {
@@ -25,6 +27,11 @@ public class ExceptionMiddleware
         catch (Exception ex)
         {
             var response = MapException(ex);
+
+            if (ex is UnauthorizedException ue && ue.ErrorCode == "INVALID_REFRESH_TOKEN")
+            {
+                _cookieService.ClearAuthCookies(context.Response);
+            }
 
             _logger.Log(response.LogLevel, ex, "Error. Code: {Code}. Path: {Path}", response.Code, context.Request.Path);
 

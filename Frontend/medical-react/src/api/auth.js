@@ -39,79 +39,48 @@ export async function confirmEmail(token) {
   return handleApiResponse(response);
 }
 
-export function saveTokens({ accessToken, refreshToken }) {
-  localStorage.setItem("accessToken", accessToken);
-  localStorage.setItem("refreshToken", refreshToken);
-}
-
-export function getAccessToken() {
-  return localStorage.getItem("accessToken");
-}
-
-export function getRefreshToken() {
-  return localStorage.getItem("refreshToken");
-}
-
-export function clearTokens() {
-  localStorage.removeItem("accessToken");
-  localStorage.removeItem("refreshToken");
-}
-
 export async function login(data) {
   const response = await fetch(`${API_URL}/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
+    body: JSON.stringify(data),
+    credentials: "include"
   });
 
   const result = await handleApiResponse(response);
-
-  saveTokens(result);
   return result;
 }
 
 export async function refreshAccessToken() {
-  const refreshToken = getRefreshToken();
-  if (!refreshToken) return null;
-
   const response = await fetch(`${API_URL}/refresh`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ refreshToken })
+    credentials: "include"
   });
 
-  if (!response.ok) {
-    clearTokens();
+  if (!response.ok){
     return null;
   }
 
-  const result = await handleApiResponse(response);
-  saveTokens(result);
-  return result.accessToken;
+  return true;
 }
 
 export async function fetchWithAuth(url, options = {}) {
-  let accessToken = getAccessToken();
-
-  const headers = {
-    "Content-Type": "application/json",
-    ...(options.headers || {}),
-    ...(accessToken ? { Authorization: "Bearer " + accessToken } : {})
-  };
-
-  let response = await fetch(url, { ...options, headers });
+  let response = await fetch(url, {
+    ...options,
+    credentials: "include"
+  });
 
   if (response.status === 401) {
-    accessToken = await refreshAccessToken();
-    if (!accessToken) {
+    const refreshed = await refreshAccessToken();
+
+    if (!refreshed) {
       throw new Error("Session expired. Please login again.");
     }
 
-    const retryHeaders = {
-      ...headers,
-      Authorization: "Bearer " + accessToken
-    };
-    response = await fetch(url, { ...options, headers: retryHeaders });
+    response = await fetch(url, {
+      ...options,
+      credentials: "include"
+    });
   }
 
   return handleApiResponse(response);
