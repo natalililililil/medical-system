@@ -12,10 +12,11 @@ public class ExceptionMiddleware
     private readonly ILogger<ExceptionMiddleware> _logger;
     private readonly ITokenCookieService _cookieService;
 
-    public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
+    public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger, ITokenCookieService cookieService)
     {
         _next = next;
         _logger = logger;
+        _cookieService = cookieService;
     }
 
     public async Task Invoke(HttpContext context)
