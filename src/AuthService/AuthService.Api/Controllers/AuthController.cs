@@ -1,9 +1,11 @@
 ﻿using AuthService.Api.Contracts.Responses;
+using AuthService.Api.Services.Cookies;
 using AuthService.Application.Accounts.Commands.ConfirmEmail;
 using AuthService.Application.Accounts.Commands.Login;
 using AuthService.Application.Accounts.Commands.RefreshTokenLogic;
 using AuthService.Application.Accounts.Commands.RegisterAccount;
 using AuthService.Application.Accounts.DTOs;
+using AuthService.Application.Common.Exceptions;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,10 +19,12 @@ public class AuthController : ControllerBase
 {
     private readonly IMediator _mediator;
     private readonly ILogger<AuthController> _logger;
-    public AuthController(IMediator mediator, ILogger<AuthController> logger)
+    private readonly ITokenCookieService _cookieService;
+    public AuthController(IMediator mediator, ILogger<AuthController> logger, ITokenCookieService cookieService)
     {
         _mediator = mediator;
         _logger = logger;
+        _cookieService = cookieService;
     }
 
     [EnableRateLimiting("AuthPolicy")]
@@ -51,20 +55,25 @@ public class AuthController : ControllerBase
     {
         _logger.LogInformation("Login attempt for email: {Email}", request.Email);
 
-        var result = await _mediator.Send(new LoginCommand(request.Email, request.Password));
+        var tokens = await _mediator.Send(new LoginCommand(request.Email, request.Password));
 
-        return Ok(result);
+        _cookieService.SetAuthCookies(Response, tokens.AccessToken, tokens.RefreshToken);
+
+        return Ok(new { message = "Login successful" });
     }
 
     [EnableRateLimiting("RefreshTokenPolicy")]
     [HttpPost("refresh")]
-    public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequest request)
+    public async Task<IActionResult> Refresh()
     {
         _logger.LogInformation("Refresh token attempt");
 
-        var result = await _mediator.Send(new RefreshTokenCommand(request.RefreshToken));
+        var refreshToken = Request.Cookies["refreshToken"];
+        var tokens = await _mediator.Send(new RefreshTokenCommand(refreshToken));
 
-        return Ok(result);
+        _cookieService.SetAuthCookies(Response, tokens.AccessToken, tokens.RefreshToken);
+
+        return Ok(new { message = "Token refreshed" });
     }
 
     [HttpGet("protected")]

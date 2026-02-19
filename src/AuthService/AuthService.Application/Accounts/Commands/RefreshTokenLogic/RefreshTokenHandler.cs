@@ -24,7 +24,7 @@ public class RefreshTokenHandler(IAuthDbContext context, IJwtTokenService jwt, I
         if (refresh.ExpiresAt <= DateTime.UtcNow)
         {
             logger.LogWarning("Expired refresh token used");
-            throw new ConflictException("INVALID_REFRESH_TOKEN", "Refresh token expired");
+            throw new UnauthorizedException("INVALID_REFRESH_TOKEN", "Refresh token expired");
         }
         var account = await context.Accounts.FirstOrDefaultAsync(a => a.Id == refresh.AccountId, ct);
 
