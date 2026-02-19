@@ -28,7 +28,7 @@ public class RegisterAccountHandler(IAuthDbContext context, ILogger<RegisterAcco
         var emailToken = new EmailConfirmationToken(account.Id);
         await context.EmailConfirmationTokens.AddAsync(emailToken, ct);
 
-        Console.WriteLine($"Email confirmation link: http://localhost:5173/confirm-email?token={emailToken.Token}");
+        Console.WriteLine($"Email confirmation link: https://localhost:5173/confirm-email?token={emailToken.Token}");
 
         logger.LogInformation("New account registered with email: {Email}", request.Email);
         return Unit.Value;
