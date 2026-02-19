@@ -8,15 +8,8 @@ using System.Text;
 
 namespace AuthService.Application.Common;
 
-public class JwtTokenService : IJwtTokenService
+public class JwtTokenService(IConfiguration _configuration) : IJwtTokenService
 {
-    private readonly IConfiguration _configuration;
-
-    public JwtTokenService(IConfiguration configuration)
-    {
-        _configuration = configuration;
-    }
-
     public string GenerateAccessToken(Guid accountId, string email)
     {
         var claims = new[]

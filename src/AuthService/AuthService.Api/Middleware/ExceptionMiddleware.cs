@@ -6,20 +6,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AuthService.Api.Middleware;
 
-public class ExceptionMiddleware
+public class ExceptionMiddleware(RequestDelegate _next, ILogger<ExceptionMiddleware> _logger)
 {
-    private readonly RequestDelegate _next;
-    private readonly ILogger<ExceptionMiddleware> _logger;
-    private readonly ITokenCookieService _cookieService;
-
-    public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger, ITokenCookieService cookieService)
-    {
-        _next = next;
-        _logger = logger;
-        _cookieService = cookieService;
-    }
-
-    public async Task Invoke(HttpContext context)
+    public async Task InvokeAsync(HttpContext context, ITokenCookieService _cookieService)
     {
         try
         {
