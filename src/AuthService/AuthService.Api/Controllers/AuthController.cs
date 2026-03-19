@@ -2,10 +2,10 @@
 using AuthService.Api.Services.Cookies;
 using AuthService.Application.Accounts.Commands.ConfirmEmail;
 using AuthService.Application.Accounts.Commands.Login;
+using AuthService.Application.Accounts.Commands.Logout;
 using AuthService.Application.Accounts.Commands.RefreshTokenLogic;
 using AuthService.Application.Accounts.Commands.RegisterAccount;
 using AuthService.Application.Accounts.DTOs;
-using AuthService.Application.Common.Exceptions;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -69,11 +69,27 @@ public class AuthController : ControllerBase
         _logger.LogInformation("Refresh token attempt");
 
         var refreshToken = Request.Cookies["refreshToken"];
+
         var tokens = await _mediator.Send(new RefreshTokenCommand(refreshToken));
 
         _cookieService.SetAuthCookies(Response, tokens.AccessToken, tokens.RefreshToken);
 
         return Ok(new { message = "Token refreshed" });
+    }
+
+    [EnableRateLimiting("AuthPolicy")]
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout()
+    {
+        _logger.LogInformation("Logout attempt");
+
+        var refreshToken = Request.Cookies["refreshToken"];
+
+        await _mediator.Send(new LogoutCommand(refreshToken));
+
+        _cookieService.ClearAuthCookies(Response);
+
+        return Ok(new { message = "Logout successful" });
     }
 
     [HttpGet("protected")]
