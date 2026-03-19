@@ -42,7 +42,7 @@ public class RefreshTokenHandler(IAuthDbContext context, IJwtTokenService jwt, I
 
         context.RefreshTokens.Add(newRefresh);
 
-        var access = jwt.GenerateAccessToken(account.Id, account.Email);
+        var access = jwt.GenerateAccessToken(account.Id, account.Email, account.Role.ToString());
 
         logger.LogInformation("Refresh token successfully used for account {AccountId}", account.Id);
 
