@@ -1,5 +1,6 @@
 ﻿using AuthService.Api.Contracts.Responses;
 using AuthService.Api.Services.Cookies;
+using AuthService.Application.Accounts.Commands.ChangeUserRole;
 using AuthService.Application.Accounts.Commands.ConfirmEmail;
 using AuthService.Application.Accounts.Commands.Login;
 using AuthService.Application.Accounts.Commands.Logout;
@@ -90,6 +91,17 @@ public class AuthController : ControllerBase
         _cookieService.ClearAuthCookies(Response);
 
         return Ok(new { message = "Logout successful" });
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpPatch("{id}/role")]
+    public async Task<IActionResult> ChangeRole(Guid id, [FromBody] ChangeUserRoleRequest newRole)
+    {
+        _logger.LogInformation("Change role attempt");
+
+        await _mediator.Send(new ChangeUserRoleCommand(id, newRole.RoleName));
+
+        return Ok(new MessageResponse("User role updated successfully"));
     }
 
     [HttpGet("protected")]

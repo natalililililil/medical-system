@@ -25,4 +25,9 @@ public class Account
     {
         IsEmailVerified = true;
     }
+
+    public void UpdateRole(Role newRole)
+    {
+        Role = newRole;
+    }
 }
