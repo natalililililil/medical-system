@@ -1,6 +1,6 @@
-﻿using AuthService.Application.Common.Exceptions;
-using AuthService.Application.Common.Interfaces;
+﻿using AuthService.Application.Common.Interfaces;
 using MediatR;
+using MedicalSystem.Shared.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 

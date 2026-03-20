@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\common\MedicalSystem.Shared\MedicalSystem.Shared.csproj" />
     <ProjectReference Include="..\AuthService.Domain\AuthService.Domain.csproj" />
   </ItemGroup>
 

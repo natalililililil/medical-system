@@ -1,18 +1,17 @@
-using AuthService.Api.Middleware;
 using AuthService.Api.Services.Cookies;
 using AuthService.Application.Accounts.Commands.RegisterAccount;
 using AuthService.Application.Common;
 using AuthService.Application.Common.Interfaces;
 using AuthService.Domain.Interfaces;
-using AuthService.Infrastructure;
 using AuthService.Infrastructure.Persistence;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using MediatR;
+using MedicalSystem.Shared.Interfaces;
+using MedicalSystem.Shared.Middleware;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -31,7 +30,11 @@ builder.Services.AddFluentValidationAutoValidation();
 
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>),typeof(ValidationBehavior<,>));
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
-builder.Services.AddScoped<ITokenCookieService, TokenCookieService>();
+
+builder.Services.AddScoped<TokenCookieService>();
+builder.Services.AddScoped<ITokenCookieService>(x => x.GetRequiredService<TokenCookieService>());
+builder.Services.AddScoped<IAuthCookieCleaner>(x => x.GetRequiredService<TokenCookieService>());
+
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(TransactionBehavior<,>));
 

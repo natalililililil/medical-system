@@ -1,10 +1,9 @@
 ﻿using AuthService.Application.Accounts.Commands.RegisterAccount;
-using AuthService.Application.Common.Exceptions;
 using AuthService.Application.Common.Interfaces;
 using AuthService.Domain.Accounts;
-using AuthService.Domain.Interfaces;
 using AuthService.Domain.Tokens;
 using MediatR;
+using MedicalSystem.Shared.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 

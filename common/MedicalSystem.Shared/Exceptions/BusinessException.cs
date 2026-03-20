@@ -1,4 +1,4 @@
-﻿namespace AuthService.Application.Common.Exceptions;
+﻿namespace MedicalSystem.Shared.Exceptions;
 
 public abstract class BusinessException : Exception
 {

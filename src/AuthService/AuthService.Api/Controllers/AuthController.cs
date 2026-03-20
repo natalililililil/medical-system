@@ -1,5 +1,4 @@
-﻿using AuthService.Api.Contracts.Responses;
-using AuthService.Api.Services.Cookies;
+﻿using AuthService.Api.Services.Cookies;
 using AuthService.Application.Accounts.Commands.ChangeUserRole;
 using AuthService.Application.Accounts.Commands.ConfirmEmail;
 using AuthService.Application.Accounts.Commands.Login;
@@ -8,6 +7,7 @@ using AuthService.Application.Accounts.Commands.RefreshTokenLogic;
 using AuthService.Application.Accounts.Commands.RegisterAccount;
 using AuthService.Application.Accounts.DTOs;
 using MediatR;
+using MedicalSystem.Shared.Contracts.Responses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;

@@ -1,14 +1,15 @@
-﻿using AuthService.Api.Contracts.Responses;
-using AuthService.Api.Services.Cookies;
-using AuthService.Application.Common.Exceptions;
+﻿using MedicalSystem.Shared.Contracts.Responses;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
+using MedicalSystem.Shared.Exceptions;
+using MedicalSystem.Shared.Interfaces;
 using FluentValidation;
-using Microsoft.EntityFrameworkCore;
 
-namespace AuthService.Api.Middleware;
+namespace MedicalSystem.Shared.Middleware;
 
 public class ExceptionMiddleware(RequestDelegate _next, ILogger<ExceptionMiddleware> _logger)
 {
-    public async Task InvokeAsync(HttpContext context, ITokenCookieService _cookieService)
+    public async Task InvokeAsync(HttpContext context, IAuthCookieCleaner? _cookieCleaner = null)
     {
         try
         {
@@ -20,7 +21,7 @@ public class ExceptionMiddleware(RequestDelegate _next, ILogger<ExceptionMiddlew
 
             if (ex is UnauthorizedException ue && ue.ErrorCode == "INVALID_REFRESH_TOKEN")
             {
-                _cookieService.ClearAuthCookies(context.Response);
+                _cookieCleaner?.Clear(context.Response);
             }
 
             _logger.Log(response.LogLevel, ex, "Error. Code: {Code}. Path: {Path}", response.Code, context.Request.Path);
@@ -40,7 +41,6 @@ public class ExceptionMiddleware(RequestDelegate _next, ILogger<ExceptionMiddlew
             UnauthorizedException ue => (401, ue.ErrorCode, "Unauthorized", LogLevel.Warning),
             NotFoundException ne => (404, ne.ErrorCode, "Resource not found", LogLevel.Warning),
             ConflictException ce => (409, ce.ErrorCode, "Operation cannot be completed", LogLevel.Warning),
-            DbUpdateException => (500, "DATABASE_ERROR", "Internal server error", LogLevel.Error),
             _ => (500, "UNEXPECTED_ERROR", "Internal server error", LogLevel.Error)
         };
     }
