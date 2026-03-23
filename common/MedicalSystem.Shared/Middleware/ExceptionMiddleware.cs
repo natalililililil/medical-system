@@ -1,15 +1,16 @@
-﻿using MedicalSystem.Shared.Contracts.Responses;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
+﻿using FluentValidation;
+using MedicalSystem.Shared.Contracts.Responses;
 using MedicalSystem.Shared.Exceptions;
 using MedicalSystem.Shared.Interfaces;
-using FluentValidation;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace MedicalSystem.Shared.Middleware;
 
 public class ExceptionMiddleware(RequestDelegate _next, ILogger<ExceptionMiddleware> _logger)
 {
-    public async Task InvokeAsync(HttpContext context, IAuthCookieCleaner? _cookieCleaner = null)
+    public async Task InvokeAsync(HttpContext context)
     {
         try
         {
@@ -21,7 +22,8 @@ public class ExceptionMiddleware(RequestDelegate _next, ILogger<ExceptionMiddlew
 
             if (ex is UnauthorizedException ue && ue.ErrorCode == "INVALID_REFRESH_TOKEN")
             {
-                _cookieCleaner?.Clear(context.Response);
+                var cookieCleaner = context.RequestServices.GetService<IAuthCookieCleaner>();
+                cookieCleaner?.Clear(context.Response);
             }
 
             _logger.Log(response.LogLevel, ex, "Error. Code: {Code}. Path: {Path}", response.Code, context.Request.Path);
