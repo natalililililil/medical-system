@@ -9,9 +9,9 @@ public sealed class DoctorProfileConfiguration : IEntityTypeConfiguration<Doctor
     public void Configure(EntityTypeBuilder<DoctorProfile> builder)
     {
         builder.ToTable("DoctorProfiles");
-        builder.HasKey(d => d.AccoundId);
+        builder.HasKey(d => d.AccountId);
 
-        builder.Property(d => d.AccoundId)
+        builder.Property(d => d.AccountId)
             .ValueGeneratedNever();
 
         builder.Property(d => d.FirstName)

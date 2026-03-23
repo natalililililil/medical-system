@@ -10,8 +10,8 @@ public sealed class PatientProfileConfiguration : IEntityTypeConfiguration<Patie
     {
         builder.ToTable("PatientProfiles");
 
-        builder.HasKey(p => p.AccoundId);
-        builder.Property(p=> p.AccoundId)
+        builder.HasKey(p => p.AccountId);
+        builder.Property(p=> p.AccountId)
             .ValueGeneratedNever();
 
         builder.Property(p => p.FirstName)

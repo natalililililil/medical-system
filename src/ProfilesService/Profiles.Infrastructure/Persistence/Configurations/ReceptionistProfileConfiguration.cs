@@ -10,8 +10,8 @@ public sealed class ReceptionistProfileConfiguration : IEntityTypeConfiguration<
     {
         builder.ToTable("ReceptionistProfiles");
 
-        builder.HasKey(rp => rp.AccoundId);
-        builder.Property(rp => rp.AccoundId)
+        builder.HasKey(rp => rp.AccountId);
+        builder.Property(rp => rp.AccountId)
             .ValueGeneratedNever();
 
         builder.Property(rp => rp.FirstName)

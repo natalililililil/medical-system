@@ -2,7 +2,7 @@
 
 public class ReceptionistProfile
 {
-    public Guid AccoundId { get; private set; }
+    public Guid AccountId { get; private set; }
     public string FirstName { get; private set; } = null!;
     public string LastName { get; private set; } = null!;
     public string? MiddleName { get; private set; }
@@ -11,7 +11,7 @@ public class ReceptionistProfile
     private ReceptionistProfile() { }
     public ReceptionistProfile(Guid id, string firstName, string lastName, string? middleName, Guid officeId, string? photoUrl)
     {
-        AccoundId = id;
+        AccountId = id;
         FirstName = firstName;
         LastName = lastName;
         MiddleName = middleName;
