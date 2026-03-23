@@ -1,0 +1,12 @@
+﻿using MediatR;
+
+namespace Profiles.Application.Features.Commands.CreateReceptionist;
+
+public record CreateReceptionistCommand(
+    Guid AccountId,
+    string FirstName,
+    string LastName,
+    string? MiddleName,
+    Guid OfficeId,
+    string? PhotoUrl = null
+) : IRequest<Guid>;
