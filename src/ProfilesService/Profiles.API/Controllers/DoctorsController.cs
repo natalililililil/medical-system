@@ -13,14 +13,14 @@ public class DoctorsController(IMediator _mediator) : ControllerBase
     [HttpGet]
     public async Task<ActionResult<List<DoctorDto>>> GetDoctors([FromQuery] GetDoctorsQuery query)
     {
-        await _mediator.Send(query);
-        return Ok();
+        var result = await _mediator.Send(query);
+        return Ok(result);
     }
 
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<DoctorDetailsDto>> GetDoctorById(Guid id)
     {
-        await _mediator.Send(new GetDoctorByIdQuery(id));
-        return Ok();
+        var result = await _mediator.Send(new GetDoctorByIdQuery(id));
+        return Ok(result);
     }
 }

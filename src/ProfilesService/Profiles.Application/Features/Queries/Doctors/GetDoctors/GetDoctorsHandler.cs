@@ -10,10 +10,10 @@ public class GetDoctorsHandler(IProfilesDbContext context) : IRequestHandler<Get
     public async Task<List<DoctorDto>> Handle(GetDoctorsQuery request, CancellationToken cancellationToken)
     {
         var query = context.DoctorProfiles.Include(d => d.Specialization).AsQueryable();
-        var search = request.Name.ToLower();
 
         if (!string.IsNullOrWhiteSpace(request.Name))
         {
+            var search = request.Name.ToLower();
             query = query.Where(d => (d.FirstName + " " + d.LastName + " " + d.MiddleName).ToLower().Contains(request.Name));
         }
 
@@ -28,7 +28,6 @@ public class GetDoctorsHandler(IProfilesDbContext context) : IRequestHandler<Get
         }
 
         return await query.Select(d => new DoctorDto(
-            d.AccountId,
             $"{d.LastName} {d.FirstName} {d.MiddleName}".Trim(),
             d.Specialization.Name,
             d.Experience,

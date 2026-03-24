@@ -1,7 +1,6 @@
 ﻿namespace Profiles.Application.Features.DTOS;
 
 public record DoctorDetailsDto(
-    Guid Id, 
     string FullName, 
     string SpecializationName, 
     int Experience, 
