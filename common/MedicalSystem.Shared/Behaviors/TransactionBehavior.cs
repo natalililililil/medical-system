@@ -1,10 +1,10 @@
-﻿using AuthService.Application.Common.Interfaces;
-using MediatR;
+﻿using MediatR;
+using MedicalSystem.Shared.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace AuthService.Application.Common;
+namespace MedicalSystem.Shared.Behaviors;
 
-public class TransactionBehavior<TRequest, TResponse>(IAuthDbContext context) : IPipelineBehavior<TRequest, TResponse>
+public class TransactionBehavior<TRequest, TResponse>(IAppDbContext context) : IPipelineBehavior<TRequest, TResponse>
     where TRequest : ICommand<TResponse>
 {
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)

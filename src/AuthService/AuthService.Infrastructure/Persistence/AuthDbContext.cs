@@ -2,10 +2,11 @@
 using AuthService.Application.Common.Interfaces;
 using AuthService.Domain.Tokens;
 using Microsoft.EntityFrameworkCore;
+using MedicalSystem.Shared.Interfaces;
 
 namespace AuthService.Infrastructure.Persistence;
 
-public class AuthDbContext: DbContext, IAuthDbContext
+public class AuthDbContext: DbContext, IAuthDbContext, IAppDbContext
 {
     public AuthDbContext(DbContextOptions<AuthDbContext> options) : base(options) { }
 

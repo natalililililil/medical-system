@@ -1,5 +1,5 @@
 ﻿using MediatR;
 
-namespace AuthService.Application.Common.Interfaces;
+namespace MedicalSystem.Shared.Interfaces;
 
 public interface ICommand<out TResponse> : IRequest<TResponse> { }

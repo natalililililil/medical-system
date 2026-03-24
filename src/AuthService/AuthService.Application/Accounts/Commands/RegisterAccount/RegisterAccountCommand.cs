@@ -1,4 +1,4 @@
-﻿using AuthService.Application.Common.Interfaces;
+﻿using MedicalSystem.Shared.Interfaces;
 using MediatR;
 
 namespace AuthService.Application.Accounts.Commands.RegisterAccount;

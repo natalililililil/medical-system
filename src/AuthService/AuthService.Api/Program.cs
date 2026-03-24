@@ -7,6 +7,7 @@ using AuthService.Infrastructure.Persistence;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using MediatR;
+using MedicalSystem.Shared.Behaviors;
 using MedicalSystem.Shared.Interfaces;
 using MedicalSystem.Shared.Middleware;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -21,7 +22,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AuthDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("AuthDb")));
 
-builder.Services.AddScoped<IAuthDbContext>(provider => provider.GetRequiredService<AuthDbContext>());
+builder.Services.AddScoped<AuthDbContext>();
+builder.Services.AddScoped<IAuthDbContext>(x => x.GetRequiredService<AuthDbContext>());
+builder.Services.AddScoped<IAppDbContext>(x => x.GetRequiredService<AuthDbContext>());
 
 builder.Services.AddControllers();
 
@@ -39,7 +42,10 @@ builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavi
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(TransactionBehavior<,>));
 
 builder.Services.AddMediatR(cfg =>
-    cfg.RegisterServicesFromAssembly(typeof(RegisterAccountCommand).Assembly));
+{
+    cfg.RegisterServicesFromAssembly(typeof(RegisterAccountCommand).Assembly);
+});
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
