@@ -22,7 +22,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AuthDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("AuthDb")));
 
-builder.Services.AddScoped<AuthDbContext>();
+builder.Services.AddDbContext<AuthDbContext>();
 builder.Services.AddScoped<IAuthDbContext>(x => x.GetRequiredService<AuthDbContext>());
 builder.Services.AddScoped<IAppDbContext>(x => x.GetRequiredService<AuthDbContext>());
 
@@ -31,19 +31,18 @@ builder.Services.AddControllers();
 builder.Services.AddValidatorsFromAssembly(typeof(RegisterAccountValidator).Assembly);
 builder.Services.AddFluentValidationAutoValidation();
 
-builder.Services.AddTransient(typeof(IPipelineBehavior<,>),typeof(ValidationBehavior<,>));
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 
 builder.Services.AddScoped<TokenCookieService>();
 builder.Services.AddScoped<ITokenCookieService>(x => x.GetRequiredService<TokenCookieService>());
 builder.Services.AddScoped<IAuthCookieCleaner>(x => x.GetRequiredService<TokenCookieService>());
 
-builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
-builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(TransactionBehavior<,>));
-
 builder.Services.AddMediatR(cfg =>
 {
     cfg.RegisterServicesFromAssembly(typeof(RegisterAccountCommand).Assembly);
+    cfg.AddOpenBehavior(typeof(LoggingBehavior<,>));
+    cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
+    cfg.AddOpenBehavior(typeof(TransactionBehavior<,>));
 });
 
 builder.Services.AddEndpointsApiExplorer();

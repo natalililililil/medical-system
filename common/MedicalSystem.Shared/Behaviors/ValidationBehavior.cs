@@ -2,7 +2,7 @@
 using FluentValidation.Results;
 using MediatR;
 
-namespace AuthService.Application.Common;
+namespace MedicalSystem.Shared.Behaviors;
 
 public class ValidationBehavior<TRequest, TResponse>(IEnumerable<IValidator<TRequest>> _validators) : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>
