@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using MedicalSystem.Shared.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using Profiles.Application.Common.Interfaces;
 using Profiles.Application.Features.DTOS;
@@ -14,7 +15,7 @@ public class GetDoctorsHandler(IProfilesDbContext context) : IRequestHandler<Get
         if (!string.IsNullOrWhiteSpace(request.Name))
         {
             var search = request.Name.ToLower();
-            query = query.Where(d => (d.FirstName + " " + d.LastName + " " + d.MiddleName).ToLower().Contains(request.Name));
+            query = query.Where(d => (d.FirstName + " " + d.LastName + " " + (d.MiddleName ?? "")).ToLower().Contains(search));
         }
 
         if (request.SpecializationId.HasValue)
@@ -27,12 +28,19 @@ public class GetDoctorsHandler(IProfilesDbContext context) : IRequestHandler<Get
             query = query.Where(d => d.OfficeId == request.OfficeId);
         }
 
-        return await query.Select(d => new DoctorDto(
+        var doctors = await query.Select(d => new DoctorDto(
             $"{d.LastName} {d.FirstName} {d.MiddleName}".Trim(),
             d.Specialization.Name,
             d.Experience,
             d.PhotoUrl,
             d.OfficeId
         )).ToListAsync(cancellationToken);
+
+        if (doctors.Count == 0)
+        {
+            throw new NotFoundException("DOCTORS_NOT_FOUND", "No doctors found with the given filters");
+        }
+
+        return doctors;
     }
 }

@@ -3,6 +3,7 @@ using MedicalSystem.Shared.Contracts.Responses;
 using MedicalSystem.Shared.Exceptions;
 using MedicalSystem.Shared.Interfaces;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -43,6 +44,7 @@ public class ExceptionMiddleware(RequestDelegate _next, ILogger<ExceptionMiddlew
             UnauthorizedException ue => (401, ue.ErrorCode, "Unauthorized", LogLevel.Warning),
             NotFoundException ne => (404, ne.ErrorCode, "Resource not found", LogLevel.Warning),
             ConflictException ce => (409, ce.ErrorCode, "Operation cannot be completed", LogLevel.Warning),
+            DbUpdateException => (500, "DATABASE_ERROR", "Internal server error", LogLevel.Error),
             _ => (500, "UNEXPECTED_ERROR", "Internal server error", LogLevel.Error)
         };
     }

@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using MedicalSystem.Shared.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using Profiles.Application.Common.Interfaces;
 using Profiles.Application.Features.DTOS;
@@ -10,6 +11,11 @@ public class GetDoctorByIdHandler(IProfilesDbContext context) : IRequestHandler<
     public async Task<DoctorDetailsDto?> Handle(GetDoctorByIdQuery request, CancellationToken cancellationToken)
     {
         var doctor = await context.DoctorProfiles.Include(d => d.Specialization).FirstOrDefaultAsync(d => d.AccountId == request.Id, cancellationToken);
+
+        if (doctor == null)
+        {
+            throw new NotFoundException("DOCTOR_NOT_FOUND", $"Doctor with ID {request.Id} not found");
+        }
 
         return new DoctorDetailsDto(
             $"{doctor.LastName} {doctor.FirstName} {doctor.MiddleName}".Trim(),

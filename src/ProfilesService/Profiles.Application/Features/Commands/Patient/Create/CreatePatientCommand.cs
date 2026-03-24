@@ -9,6 +9,6 @@ public record CreatePatientCommand(
     string LastName,
     string? MiddleName,
     DateTime DateOfBirth,
-    string Phone,
+    string? Phone,
     string? PhotoUrl = null
 ) : ICommand<Guid>;
