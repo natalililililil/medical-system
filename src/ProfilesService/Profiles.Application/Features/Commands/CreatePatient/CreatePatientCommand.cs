@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using MedicalSystem.Shared.Interfaces;
 
 namespace Profiles.Application.Features.Commands.CreatePatient;
 
@@ -10,4 +11,4 @@ public record CreatePatientCommand(
     DateTime DateOfBirth,
     string Phone,
     string? PhotoUrl = null
-) : IRequest<Guid>;
+) : ICommand<Guid>;

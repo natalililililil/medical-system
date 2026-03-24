@@ -13,7 +13,6 @@ public class CreateReceptionistHandler(IProfilesDbContext context) : IRequestHan
             request.MiddleName, request.OfficeId ,request.PhotoUrl);
 
         context.ReceptionistProfiles.Add(receptionist);
-        await context.SaveChangesAsync(ct);
         return receptionist.AccountId;
     }
 }

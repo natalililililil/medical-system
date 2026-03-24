@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using MedicalSystem.Shared.Interfaces;
 
 namespace Profiles.Application.Features.Commands.CreateReceptionist;
 
@@ -9,4 +10,4 @@ public record CreateReceptionistCommand(
     string? MiddleName,
     Guid OfficeId,
     string? PhotoUrl = null
-) : IRequest<Guid>;
+) : ICommand<Guid>;

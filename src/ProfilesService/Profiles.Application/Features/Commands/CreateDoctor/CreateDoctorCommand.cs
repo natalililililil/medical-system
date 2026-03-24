@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using MedicalSystem.Shared.Interfaces;
 
 namespace Profiles.Application.Features.Commands.CreateDoctor;
 
@@ -12,4 +13,4 @@ public record CreateDoctorCommand(
     Guid SpecializationId,
     Guid OfficeId,
     string? PhotoUrl = null
-) : IRequest<Guid>;
+) : ICommand<Guid>;

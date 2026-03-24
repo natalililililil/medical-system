@@ -14,7 +14,6 @@ public class CreateDoctorHandler(IProfilesDbContext context) : IRequestHandler<C
             request.OfficeId);
 
         context.DoctorProfiles.Add(doctor);
-        await context.SaveChangesAsync(ct);
         return doctor.AccountId;
     }
 }

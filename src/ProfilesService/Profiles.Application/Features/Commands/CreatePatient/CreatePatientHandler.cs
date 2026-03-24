@@ -13,7 +13,6 @@ public class CreatePatientHandler(IProfilesDbContext context) : IRequestHandler<
             request.MiddleName, request.DateOfBirth, request.PhotoUrl, request.Phone);
 
         context.PatientProfiles.Add(patient);
-        await context.SaveChangesAsync(ct);
         return patient.AccountId;
     }
 }
