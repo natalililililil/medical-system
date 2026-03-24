@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Profiles.Application.Features.DTOS;
 using Profiles.Application.Features.Queries.Doctor.GetDoctorById;
 using Profiles.Application.Features.Queries.Doctor.GetDoctors;
@@ -11,6 +12,7 @@ namespace Profiles.API.Controllers;
 public class DoctorsController(IMediator _mediator) : ControllerBase
 {
     [HttpGet]
+    [EnableRateLimiting("ReadPolicy")]
     public async Task<ActionResult<List<DoctorDto>>> GetDoctors([FromQuery] GetDoctorsQuery query)
     {
         var result = await _mediator.Send(query);
@@ -18,6 +20,7 @@ public class DoctorsController(IMediator _mediator) : ControllerBase
     }
 
     [HttpGet("{id:guid}")]
+    [EnableRateLimiting("ReadPolicy")]
     public async Task<ActionResult<DoctorDetailsDto>> GetDoctorById(Guid id)
     {
         var result = await _mediator.Send(new GetDoctorByIdQuery(id));

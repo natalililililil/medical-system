@@ -3,6 +3,7 @@ using MedicalSystem.Shared.Behaviors;
 using MedicalSystem.Shared.Interfaces;
 using MedicalSystem.Shared.Middleware;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Profiles.Application.Common.Interfaces;
 using Profiles.Application.Features.Commands.Doctor.Create;
@@ -30,6 +31,21 @@ builder.Services.AddMediatR(cfg =>
 });
 
 builder.Services.AddOpenApi();
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddFixedWindowLimiter("ReadPolicy", opt =>
+    {
+        opt.PermitLimit = 60;
+        opt.Window = TimeSpan.FromMinutes(1);
+    });
+
+    options.AddFixedWindowLimiter("WritePolicy", opt =>
+    {
+        opt.PermitLimit = 20;
+        opt.Window = TimeSpan.FromMinutes(1);
+    });
+});
 
 var app = builder.Build();
 

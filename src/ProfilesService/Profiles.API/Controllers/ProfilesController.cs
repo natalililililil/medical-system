@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using MedicalSystem.Shared.Contracts.Responses;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Profiles.Application.Features.Commands.Doctor.Create;
 using Profiles.Application.Features.Commands.Patient.Create;
 using Profiles.Application.Features.Commands.Receptionist.Create;
@@ -9,6 +10,7 @@ namespace Profiles.API.Controllers;
 
 [ApiController]
 [Route("api/profiles")]
+[EnableRateLimiting("WritePolicy")]
 public class ProfilesController(IMediator _mediator) : ControllerBase
 {
     [HttpPost("patients")]
