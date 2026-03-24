@@ -1,16 +1,14 @@
 ﻿using MediatR;
 using MedicalSystem.Shared.Interfaces;
 
-namespace Profiles.Application.Features.Commands.CreateDoctor;
+namespace Profiles.Application.Features.Commands.Patient.Create;
 
-public record CreateDoctorCommand(
+public record CreatePatientCommand(
     Guid AccountId,
     string FirstName,
     string LastName,
     string? MiddleName,
     DateTime DateOfBirth,
-    int CareerStartYear,
-    Guid SpecializationId,
-    Guid OfficeId,
+    string Phone,
     string? PhotoUrl = null
 ) : ICommand<Guid>;

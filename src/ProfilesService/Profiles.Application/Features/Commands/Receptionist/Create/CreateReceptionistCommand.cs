@@ -1,14 +1,13 @@
 ﻿using MediatR;
 using MedicalSystem.Shared.Interfaces;
 
-namespace Profiles.Application.Features.Commands.CreatePatient;
+namespace Profiles.Application.Features.Commands.Receptionist.Create;
 
-public record CreatePatientCommand(
+public record CreateReceptionistCommand(
     Guid AccountId,
     string FirstName,
     string LastName,
     string? MiddleName,
-    DateTime DateOfBirth,
-    string Phone,
+    Guid OfficeId,
     string? PhotoUrl = null
 ) : ICommand<Guid>;

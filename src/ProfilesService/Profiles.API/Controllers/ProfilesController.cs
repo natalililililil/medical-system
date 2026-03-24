@@ -1,9 +1,9 @@
 ﻿using MediatR;
 using MedicalSystem.Shared.Contracts.Responses;
 using Microsoft.AspNetCore.Mvc;
-using Profiles.Application.Features.Commands.CreateDoctor;
-using Profiles.Application.Features.Commands.CreatePatient;
-using Profiles.Application.Features.Commands.CreateReceptionist;
+using Profiles.Application.Features.Commands.Doctor.Create;
+using Profiles.Application.Features.Commands.Patient.Create;
+using Profiles.Application.Features.Commands.Receptionist.Create;
 
 namespace Profiles.API.Controllers;
 

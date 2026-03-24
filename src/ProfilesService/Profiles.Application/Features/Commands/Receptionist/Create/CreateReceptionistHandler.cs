@@ -2,7 +2,7 @@
 using Profiles.Application.Common.Interfaces;
 using Profiles.Domain.Entities;
 
-namespace Profiles.Application.Features.Commands.CreateReceptionist;
+namespace Profiles.Application.Features.Commands.Receptionist.Create;
 
 public class CreateReceptionistHandler(IProfilesDbContext context) : IRequestHandler<CreateReceptionistCommand, Guid>
 {

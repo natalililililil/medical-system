@@ -3,7 +3,7 @@ using MedicalSystem.Shared.Interfaces;
 using MedicalSystem.Shared.Middleware;
 using Microsoft.EntityFrameworkCore;
 using Profiles.Application.Common.Interfaces;
-using Profiles.Application.Features.Commands.CreateDoctor;
+using Profiles.Application.Features.Commands.Doctor.Create;
 using Profiles.Infrastructure.Persistence;
 using Scalar.AspNetCore;
 

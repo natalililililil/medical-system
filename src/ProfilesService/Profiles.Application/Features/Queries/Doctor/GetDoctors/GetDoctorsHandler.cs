@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Profiles.Application.Common.Interfaces;
 using Profiles.Application.Features.DTOS;
 
-namespace Profiles.Application.Features.Queries.Doctors.GetDoctors;
+namespace Profiles.Application.Features.Queries.Doctor.GetDoctors;
 
 public class GetDoctorsHandler(IProfilesDbContext context) : IRequestHandler<GetDoctorsQuery, List<DoctorDto>>
 {

@@ -2,7 +2,7 @@
 using Profiles.Application.Common.Interfaces;
 using Profiles.Domain.Entities;
 
-namespace Profiles.Application.Features.Commands.CreateDoctor;
+namespace Profiles.Application.Features.Commands.Doctor.Create;
 
 public class CreateDoctorHandler(IProfilesDbContext context) : IRequestHandler<CreateDoctorCommand, Guid>
 {

@@ -1,8 +1,8 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Profiles.Application.Features.DTOS;
-using Profiles.Application.Features.Queries.Doctors.GetDoctorById;
-using Profiles.Application.Features.Queries.Doctors.GetDoctors;
+using Profiles.Application.Features.Queries.Doctor.GetDoctorById;
+using Profiles.Application.Features.Queries.Doctor.GetDoctors;
 
 namespace Profiles.API.Controllers;
 
