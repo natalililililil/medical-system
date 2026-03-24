@@ -1,6 +1,8 @@
+using FluentValidation;
 using MedicalSystem.Shared.Behaviors;
 using MedicalSystem.Shared.Interfaces;
 using MedicalSystem.Shared.Middleware;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Profiles.Application.Common.Interfaces;
 using Profiles.Application.Features.Commands.Doctor.Create;
@@ -16,6 +18,8 @@ builder.Services.AddScoped<IProfilesDbContext>(provider => provider.GetRequiredS
 builder.Services.AddScoped<IAppDbContext>(provider => provider.GetRequiredService<ProfilesDbContext>());
 
 builder.Services.AddControllers();
+
+builder.Services.AddValidatorsFromAssembly(typeof(CreateDoctorValidator).Assembly);
 
 builder.Services.AddMediatR(cfg =>
 {
