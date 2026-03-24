@@ -1,3 +1,5 @@
+using MedicalSystem.Shared.Behaviors;
+using MedicalSystem.Shared.Interfaces;
 using MedicalSystem.Shared.Middleware;
 using Microsoft.EntityFrameworkCore;
 using Profiles.Application.Common.Interfaces;
@@ -9,12 +11,19 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<ProfilesDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("ProfilesDb")));
+
 builder.Services.AddScoped<IProfilesDbContext>(provider => provider.GetRequiredService<ProfilesDbContext>());
+builder.Services.AddScoped<IAppDbContext>(provider => provider.GetRequiredService<ProfilesDbContext>());
 
 builder.Services.AddControllers();
 
 builder.Services.AddMediatR(cfg =>
-    cfg.RegisterServicesFromAssembly(typeof(CreateDoctorCommand).Assembly));
+{
+    cfg.RegisterServicesFromAssembly(typeof(CreateDoctorCommand).Assembly);
+    cfg.AddOpenBehavior(typeof(LoggingBehavior<,>));
+    cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
+    cfg.AddOpenBehavior(typeof(TransactionBehavior<,>));
+});
 
 builder.Services.AddOpenApi();
 

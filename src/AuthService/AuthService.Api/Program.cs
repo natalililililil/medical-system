@@ -22,7 +22,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AuthDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("AuthDb")));
 
-builder.Services.AddDbContext<AuthDbContext>();
 builder.Services.AddScoped<IAuthDbContext>(x => x.GetRequiredService<AuthDbContext>());
 builder.Services.AddScoped<IAppDbContext>(x => x.GetRequiredService<AuthDbContext>());
 

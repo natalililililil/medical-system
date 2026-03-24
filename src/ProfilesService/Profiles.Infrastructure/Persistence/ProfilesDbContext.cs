@@ -1,10 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using MedicalSystem.Shared.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Profiles.Application.Common.Interfaces;
 using Profiles.Domain.Entities;
 
 namespace Profiles.Infrastructure.Persistence;
 
-public class ProfilesDbContext: DbContext, IProfilesDbContext
+public class ProfilesDbContext: DbContext, IProfilesDbContext, IAppDbContext
 {
     public ProfilesDbContext(DbContextOptions<ProfilesDbContext> options) : base(options) { }
 
