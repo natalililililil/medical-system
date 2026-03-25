@@ -1,15 +1,19 @@
 ﻿using MediatR;
 using MedicalSystem.Shared.Exceptions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Profiles.Application.Common.Interfaces;
 using Profiles.Application.Features.DTOS;
 
 namespace Profiles.Application.Features.Queries.Doctor.GetDoctors;
 
-public class GetDoctorsHandler(IProfilesDbContext context) : IRequestHandler<GetDoctorsQuery, List<DoctorDto>>
+public class GetDoctorsHandler(IProfilesDbContext context, ILogger<GetDoctorsHandler> _logger) : IRequestHandler<GetDoctorsQuery, List<DoctorDto>>
 {
     public async Task<List<DoctorDto>> Handle(GetDoctorsQuery request, CancellationToken cancellationToken)
     {
+        _logger.LogInformation("Searching for doctors with filters: Name={SearchName}, SpecializationId={SpecId}, OfficeId={OfficeId}",
+            request.Name, request.SpecializationId, request.OfficeId);
+
         var query = context.DoctorProfiles.Include(d => d.Specialization).AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(request.Name))
@@ -38,8 +42,11 @@ public class GetDoctorsHandler(IProfilesDbContext context) : IRequestHandler<Get
 
         if (doctors.Count == 0)
         {
+            _logger.LogWarning("No doctors matched the provided search criteria");
             throw new NotFoundException("DOCTORS_NOT_FOUND", "No doctors found with the given filters");
         }
+
+        _logger.LogInformation("Successfully retrieved {Count} doctors matching the criteria", doctors.Count);
 
         return doctors;
     }
