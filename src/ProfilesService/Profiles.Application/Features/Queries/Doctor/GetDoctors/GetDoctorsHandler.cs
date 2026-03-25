@@ -19,7 +19,10 @@ public class GetDoctorsHandler(IProfilesDbContext context, ILogger<GetDoctorsHan
         if (!string.IsNullOrWhiteSpace(request.Name))
         {
             var search = request.Name.ToLower();
-            query = query.Where(d => (d.FirstName + " " + d.LastName + " " + (d.MiddleName ?? "")).ToLower().Contains(search));
+            query = query.Where(d => 
+                d.FirstName.ToLower().Contains(search) ||
+                d.LastName.ToLower().Contains(search) ||
+                (d.MiddleName != null && d.MiddleName.ToLower().Contains(search)));
         }
 
         if (request.SpecializationId.HasValue)
