@@ -34,7 +34,7 @@ public class AuthController : ControllerBase
     {
         _logger.LogInformation("Registration attempt for email: {Email}", request.Email);
 
-        await _mediator.Send(new RegisterAccountCommand(request.Email, request.Password, request.ConfirmPassword));
+        await _mediator.Send(new RegisterAccountCommand(request.Email, request.Password, request.ConfirmPassword, request.Role));
 
         return Ok(new MessageResponse("Registration completed successfully"));
     }

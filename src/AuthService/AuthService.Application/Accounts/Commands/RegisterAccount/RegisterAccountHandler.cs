@@ -19,8 +19,14 @@ public class RegisterAccountHandler(IAuthDbContext context, ILogger<RegisterAcco
             throw new ConflictException("EMAIL_ALREADY_CONFIRMED", "An account with this email already exists");
         }
 
+        if (!Enum.TryParse<Role>(request.Role, true, out var parsedRole))
+        {
+            parsedRole = Role.Patient;
+            logger.LogDebug("Invalid or missing role '{Role}' for {Email}. Defaulted to Patient", request.Role, request.Email);
+        }
+
         var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
-        var account = new Account(request.Email, passwordHash);
+        var account = new Account(request.Email, passwordHash, parsedRole);
 
         await context.Accounts.AddAsync(account, ct);
 

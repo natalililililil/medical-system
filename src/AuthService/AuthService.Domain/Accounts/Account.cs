@@ -11,12 +11,12 @@ public class Account
 
     private Account() { }
 
-    public Account(string email, string passwordHash)
+    public Account(string email, string passwordHash, Role role)
     {
         Id = Guid.NewGuid();
         Email = email;
         PasswordHash = passwordHash;
-        Role = Role.Patient;
+        Role = role;
         IsEmailVerified = false;
         CreatedAt = DateTime.UtcNow;
     }
