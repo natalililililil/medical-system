@@ -4,6 +4,7 @@ using AuthService.Application.Common;
 using AuthService.Application.Common.Interfaces;
 using AuthService.Domain.Interfaces;
 using AuthService.Infrastructure.Persistence;
+using Confluent.Kafka;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using MediatR;
@@ -111,6 +112,13 @@ builder.Services.AddRateLimiter(options =>
         limiterOptions.PermitLimit = 60;
     });
 });
+
+var config = new ProducerConfig
+{
+    BootstrapServers = "localhost:9092"
+};
+
+builder.Services.AddSingleton<IProducer<Null, string>>(sp => new ProducerBuilder<Null, string>(config).Build());
 
 var app = builder.Build();
 

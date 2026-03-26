@@ -2,14 +2,19 @@
 using AuthService.Application.Common.Interfaces;
 using AuthService.Domain.Accounts;
 using AuthService.Domain.Tokens;
+using Confluent.Kafka;
 using MediatR;
+using MedicalSystem.Shared.Contracts.Events;
+using MedicalSystem.Shared.Enums;
 using MedicalSystem.Shared.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
 
 namespace AuthService.Application.Accounts.Commands;
 
-public class RegisterAccountHandler(IAuthDbContext context, ILogger<RegisterAccountHandler> logger) : IRequestHandler<RegisterAccountCommand, Unit>
+public class RegisterAccountHandler(IAuthDbContext context, ILogger<RegisterAccountHandler> logger, 
+    IProducer<Null, string> _kafkaProducer) : IRequestHandler<RegisterAccountCommand, Unit>
 {
     public async Task<Unit> Handle(RegisterAccountCommand request, CancellationToken ct)
     {
@@ -36,6 +41,17 @@ public class RegisterAccountHandler(IAuthDbContext context, ILogger<RegisterAcco
         Console.WriteLine($"Email confirmation link: https://localhost:5173/confirm-email?token={emailToken.Token}");
 
         logger.LogInformation("New account registered with email: {Email}", request.Email);
+
+        var accountCreatedEvent = new AccountCreatedEvent
+        {
+            AccountId = account.Id,
+            Role = parsedRole
+        };
+
+        await _kafkaProducer.ProduceAsync(
+            "account-created",
+            new Message<Null, string> { Value = JsonSerializer.Serialize(accountCreatedEvent) }
+        );
         return Unit.Value;
     }
 }

@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\common\MedicalSystem.Shared\MedicalSystem.Shared.csproj" />
+  </ItemGroup>
+
 </Project>

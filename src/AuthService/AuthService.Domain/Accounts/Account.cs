@@ -1,4 +1,6 @@
-﻿namespace AuthService.Domain.Accounts;
+﻿using MedicalSystem.Shared.Enums;
+
+namespace AuthService.Domain.Accounts;
 
 public class Account
 {
