@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Profiles.Application.Common.Interfaces;
 using Profiles.Application.Features.Commands.Doctor.Create;
+using Profiles.Application.Services;
 using Profiles.Infrastructure.Persistence;
 using Scalar.AspNetCore;
 
@@ -46,6 +47,8 @@ builder.Services.AddRateLimiter(options =>
         opt.Window = TimeSpan.FromMinutes(1);
     });
 });
+
+builder.Services.AddHostedService<AccountCreatedConsumerService>();
 
 var app = builder.Build();
 
