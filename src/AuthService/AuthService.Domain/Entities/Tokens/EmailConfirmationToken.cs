@@ -1,4 +1,4 @@
-﻿namespace AuthService.Domain.Tokens;
+﻿namespace AuthService.Domain.Entities.Tokens;
 
 public class EmailConfirmationToken
 {

@@ -1,6 +1,6 @@
 ﻿using AuthService.Application.Accounts.DTOs;
 using AuthService.Application.Common.Interfaces;
-using AuthService.Domain.Accounts;
+using AuthService.Domain.Entities.Accounts;
 using AuthService.Domain.Interfaces;
 using MediatR;
 using MedicalSystem.Shared.Exceptions;

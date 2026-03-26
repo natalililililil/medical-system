@@ -1,7 +1,5 @@
-﻿using AuthService.Domain.Accounts;
-using FluentValidation;
+﻿using FluentValidation;
 using MedicalSystem.Shared.Enums;
-using System.Data;
 
 namespace AuthService.Application.Accounts.Commands.ChangeUserRole;
 

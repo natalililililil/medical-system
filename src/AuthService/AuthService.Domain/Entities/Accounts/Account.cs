@@ -1,6 +1,6 @@
 ﻿using MedicalSystem.Shared.Enums;
 
-namespace AuthService.Domain.Accounts;
+namespace AuthService.Domain.Entities.Accounts;
 
 public class Account
 {

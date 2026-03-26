@@ -1,4 +1,4 @@
-﻿namespace AuthService.Domain.Accounts;
+﻿namespace AuthService.Domain.Entities.Accounts;
 
 public class RefreshToken
 {

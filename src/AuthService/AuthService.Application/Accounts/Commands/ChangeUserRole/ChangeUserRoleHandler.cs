@@ -1,5 +1,4 @@
 ﻿using AuthService.Application.Common.Interfaces;
-using AuthService.Domain.Accounts;
 using MediatR;
 using MedicalSystem.Shared.Enums;
 using MedicalSystem.Shared.Exceptions;

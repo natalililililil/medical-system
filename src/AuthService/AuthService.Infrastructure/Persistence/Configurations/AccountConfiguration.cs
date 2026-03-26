@@ -1,4 +1,4 @@
-﻿using AuthService.Domain.Accounts;
+﻿using AuthService.Domain.Entities.Accounts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
