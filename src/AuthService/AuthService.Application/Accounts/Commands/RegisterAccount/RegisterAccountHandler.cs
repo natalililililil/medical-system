@@ -1,12 +1,12 @@
 ﻿using AuthService.Application.Accounts.Commands.RegisterAccount;
 using AuthService.Application.Common.Interfaces;
 using AuthService.Domain.Entities.Accounts;
-using AuthService.Domain.Entities.Outbox;
 using AuthService.Domain.Entities.Tokens;
 using MediatR;
 using MedicalSystem.Shared.Contracts.Events;
 using MedicalSystem.Shared.Enums;
 using MedicalSystem.Shared.Exceptions;
+using MedicalSystem.Shared.Outbox;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;

@@ -3,6 +3,7 @@ using AuthService.Application.Accounts.Commands.RegisterAccount;
 using AuthService.Application.Common;
 using AuthService.Application.Common.Interfaces;
 using AuthService.Domain.Interfaces;
+using AuthService.Infrastructure.Outbox;
 using AuthService.Infrastructure.Persistence;
 using Confluent.Kafka;
 using FluentValidation;
@@ -11,6 +12,7 @@ using MediatR;
 using MedicalSystem.Shared.Behaviors;
 using MedicalSystem.Shared.Interfaces;
 using MedicalSystem.Shared.Middleware;
+using MedicalSystem.Shared.Outbox.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
@@ -25,6 +27,7 @@ builder.Services.AddDbContext<AuthDbContext>(options =>
 
 builder.Services.AddScoped<IAuthDbContext>(x => x.GetRequiredService<AuthDbContext>());
 builder.Services.AddScoped<IAppDbContext>(x => x.GetRequiredService<AuthDbContext>());
+builder.Services.AddScoped<IHasOutbox>(x => x.GetRequiredService<AuthDbContext>());
 
 builder.Services.AddControllers();
 
@@ -113,12 +116,13 @@ builder.Services.AddRateLimiter(options =>
     });
 });
 
-var config = new ProducerConfig
+builder.Services.AddSingleton<IProducer<string, string>>(sp =>
 {
-    BootstrapServers = "localhost:9092"
-};
-
-builder.Services.AddSingleton<IProducer<Null, string>>(sp => new ProducerBuilder<Null, string>(config).Build());
+    var config = new ProducerConfig { BootstrapServers = "localhost:9092" };
+    return new ProducerBuilder<string, string>(config).Build();
+});
+builder.Services.AddSingleton<IMessageBroker, KafkaProducer>();
+builder.Services.AddHostedService<AuthOutboxWorker>();
 
 var app = builder.Build();
 
