@@ -8,9 +8,9 @@ using AuthService.Infrastructure.Persistence;
 using Confluent.Kafka;
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using MediatR;
 using MedicalSystem.Shared.Behaviors;
 using MedicalSystem.Shared.Interfaces;
+using MedicalSystem.Shared.MessageBroker.Kafka;
 using MedicalSystem.Shared.Middleware;
 using MedicalSystem.Shared.Outbox.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -121,7 +121,7 @@ builder.Services.AddSingleton<IProducer<string, string>>(sp =>
     var config = new ProducerConfig { BootstrapServers = "localhost:9092" };
     return new ProducerBuilder<string, string>(config).Build();
 });
-builder.Services.AddSingleton<IMessageBroker, KafkaProducer>();
+builder.Services.AddSingleton<IMessageBroker, BaseKafkaProducer>();
 builder.Services.AddHostedService<AuthOutboxWorker>();
 
 var app = builder.Build();

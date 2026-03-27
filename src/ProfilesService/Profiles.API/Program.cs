@@ -2,12 +2,11 @@ using FluentValidation;
 using MedicalSystem.Shared.Behaviors;
 using MedicalSystem.Shared.Interfaces;
 using MedicalSystem.Shared.Middleware;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Profiles.Application.Common.Interfaces;
 using Profiles.Application.Features.Commands.Doctor.Create;
-using Profiles.Application.Services;
+using Profiles.Infrastructure.MessageBroker;
 using Profiles.Infrastructure.Persistence;
 using Scalar.AspNetCore;
 
@@ -48,7 +47,7 @@ builder.Services.AddRateLimiter(options =>
     });
 });
 
-builder.Services.AddHostedService<AccountCreatedConsumerService>();
+builder.Services.AddHostedService<AccountCreatedConsumer>();
 
 var app = builder.Build();
 
