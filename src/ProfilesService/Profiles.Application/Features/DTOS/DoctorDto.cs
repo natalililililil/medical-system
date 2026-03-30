@@ -1,8 +1,11 @@
-﻿namespace Profiles.Application.Features.DTOS;
+﻿using Profiles.Domain.Entities;
+
+namespace Profiles.Application.Features.DTOS;
 
 public record DoctorDto(
     string FullName, 
     string SpecializationName, 
     int Experience, 
-    string? PhotoUrl, 
+    string? PhotoUrl,
+    DoctorStatus Status,
     Guid OfficeId);

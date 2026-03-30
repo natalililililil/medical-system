@@ -10,14 +10,14 @@ public class DoctorProfile
     public int CareerStartYear { get; private set; }
     public DoctorStatus Status { get; private set; } = DoctorStatus.AtWork;
     public string? PhotoUrl { get; private set; }
-    public Guid SpecializationId { get; private set; }
-    public Specialization Specialization { get; private set; } = null!;
+    public Guid? SpecializationId { get; private set; }
+    public Specialization? Specialization { get; private set; }
     public Guid OfficeId { get; private set; }
     public int Experience => DateTime.UtcNow.Year - CareerStartYear + 1;
 
     private DoctorProfile() { }
     public DoctorProfile(Guid id, string firstName, string lastName, string? middleName, DateTime dateOfBirth, 
-        int careerStartYear, string? photoUrl, Guid specializationId, Guid officeId)
+        int careerStartYear, string? photoUrl, Guid? specializationId, Guid officeId)
     {
         AccountId = id;
         FirstName = firstName;

@@ -14,7 +14,7 @@ public class GetDoctorsHandler(IProfilesDbContext context, ILogger<GetDoctorsHan
         _logger.LogInformation("Searching for doctors with filters: Name={SearchName}, SpecializationId={SpecId}, OfficeId={OfficeId}",
             request.Name, request.SpecializationId, request.OfficeId);
 
-        var query = context.DoctorProfiles.Include(d => d.Specialization).AsQueryable();
+        var query = context.DoctorProfiles.Include(d => d.Specialization).Where(d => d.Specialization != null).AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(request.Name))
         {
@@ -37,9 +37,10 @@ public class GetDoctorsHandler(IProfilesDbContext context, ILogger<GetDoctorsHan
 
         var doctors = await query.Select(d => new DoctorDto(
             $"{d.LastName} {d.FirstName} {d.MiddleName}".Trim(),
-            d.Specialization.Name,
+            d.Specialization != null ? d.Specialization.Name : "No specialization",
             d.Experience,
             d.PhotoUrl,
+            d.Status,
             d.OfficeId
         )).ToListAsync(cancellationToken);
 
