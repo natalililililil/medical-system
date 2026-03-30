@@ -45,6 +45,7 @@ public sealed class DoctorProfileConfiguration : IEntityTypeConfiguration<Doctor
         builder.HasOne(d => d.Specialization)
             .WithMany()
             .HasForeignKey(d => d.SpecializationId)
+            .IsRequired(false)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasIndex(x => x.SpecializationId);
