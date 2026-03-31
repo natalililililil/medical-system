@@ -22,7 +22,7 @@ public class CreateBaseProfileHandler(IProfilesDbContext _dbContext, ILogger<Cre
         switch (request.Role)
         {
             case Role.Doctor:
-                _dbContext.DoctorProfiles.Add(new DoctorProfile(request.AccountId, "", "", null, DateTime.MinValue, DateTime.UtcNow.Year, null, Guid.Empty, Guid.Empty));
+                _dbContext.DoctorProfiles.Add(new DoctorProfile(request.AccountId, "", "", null, DateTime.MinValue, DateTime.UtcNow.Year, null, null, Guid.Empty));
                 break;
             case Role.Patient:
                 _dbContext.PatientProfiles.Add(new PatientProfile(request.AccountId, "", "", null, DateTime.MinValue, null, null));

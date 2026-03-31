@@ -1,14 +1,19 @@
 using FluentValidation;
+using FluentValidation.AspNetCore;
 using MedicalSystem.Shared.Behaviors;
 using MedicalSystem.Shared.Interfaces;
 using MedicalSystem.Shared.Middleware;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Profiles.API.Models.Requests.Validation;
 using Profiles.Application.Common.Interfaces;
-using Profiles.Application.Features.Commands.Doctor.Create;
+using Profiles.Application.Features.Commands.CreateBaseProfile;
 using Profiles.Infrastructure.MessageBroker;
 using Profiles.Infrastructure.Persistence;
 using Scalar.AspNetCore;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,11 +25,13 @@ builder.Services.AddScoped<IAppDbContext>(provider => provider.GetRequiredServic
 
 builder.Services.AddControllers();
 
-builder.Services.AddValidatorsFromAssembly(typeof(CreateDoctorValidator).Assembly);
+builder.Services.AddValidatorsFromAssembly(typeof(UpdateDoctorRequestValidator).Assembly);
+builder.Services.AddValidatorsFromAssembly(typeof(CreateBaseProfileValidator).Assembly);
+builder.Services.AddFluentValidationAutoValidation();
 
 builder.Services.AddMediatR(cfg =>
 {
-    cfg.RegisterServicesFromAssembly(typeof(CreateDoctorCommand).Assembly);
+    cfg.RegisterServicesFromAssembly(typeof(CreateBaseProfileCommand).Assembly);
     cfg.AddOpenBehavior(typeof(LoggingBehavior<,>));
     cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
     cfg.AddOpenBehavior(typeof(TransactionBehavior<,>));
@@ -42,6 +49,47 @@ builder.Services.AddCors(options =>
             .AllowAnyMethod();
     });
 });
+
+
+var jwtSection = builder.Configuration.GetSection("JwtSettings");
+var key = Encoding.UTF8.GetBytes(jwtSection["Secret"]);
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidIssuer = jwtSection["Issuer"],
+        ValidateAudience = true,
+        ValidAudience = jwtSection["Audience"],
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        ValidateLifetime = true,
+        ClockSkew = TimeSpan.Zero
+    };
+
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            context.Request.Cookies.TryGetValue("accessToken", out var accessToken);
+
+            if (!string.IsNullOrEmpty(accessToken))
+            {
+                context.Token = accessToken;
+            }
+
+            return Task.CompletedTask;
+        }
+    };
+});
+
+
 
 builder.Services.AddRateLimiter(options =>
 {
@@ -73,6 +121,7 @@ app.UseHttpsRedirection();
 
 app.UseCors("Frontend");
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

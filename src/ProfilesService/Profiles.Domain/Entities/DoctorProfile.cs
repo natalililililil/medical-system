@@ -29,4 +29,17 @@ public class DoctorProfile
         SpecializationId = specializationId;
         OfficeId = officeId;
     }
+
+    public void Update(string firstName, string lastName, string? middleName, DateTime dateOfBirth,
+        int careerStartYear, string? photoUrl, Guid? specializationId, Guid officeId)
+    {
+        FirstName = firstName;
+        LastName = lastName;
+        MiddleName = middleName;
+        DateOfBirth = dateOfBirth;
+        CareerStartYear = careerStartYear;
+        SpecializationId = specializationId;
+        OfficeId = officeId;
+        PhotoUrl = photoUrl;
+    }
 }
