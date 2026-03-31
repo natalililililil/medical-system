@@ -10,6 +10,15 @@ public class UpdateDoctorProfileValidator : AbstractValidator<UpdateDoctorProfil
         RuleFor(x => x.AccountId)
             .NotEmpty().WithMessage("Account Id is required for profile creation");
 
+        RuleFor(x => x.FirstName)
+            .IsValidName("First name");
+
+        RuleFor(x => x.LastName)
+            .IsValidName("Last name");
+
+        RuleFor(x => x.MiddleName)
+            .IsValidName("Middle name");
+
         RuleFor(x => x.DateOfBirth)
             .LessThan(DateTime.Now.AddYears(-18))
             .WithMessage("The doctor must be over 18 years old");

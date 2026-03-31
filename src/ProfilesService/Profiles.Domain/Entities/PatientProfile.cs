@@ -21,4 +21,14 @@ public class PatientProfile
         PhotoUrl = photo;
         Phone = phone;
     }
+
+    public void Update(string firstName, string lastName, string? middleName, DateTime dateOfBirth, string? photo, string? phone)
+    {
+        FirstName = firstName;
+        LastName = lastName;
+        MiddleName = middleName;
+        DateOfBirth = dateOfBirth;
+        PhotoUrl = photo;
+        Phone = phone;
+    }
 }

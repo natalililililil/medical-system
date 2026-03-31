@@ -8,15 +8,10 @@ public class UpdateDoctorRequestValidator : AbstractValidator<UpdateDoctorReques
     public UpdateDoctorRequestValidator()
     {
         RuleFor(x => x.FirstName)
-            .NotEmpty().WithMessage("First name is required")
-            .IsValidName("First name");
+            .NotEmpty().WithMessage("First name is required");
 
         RuleFor(x => x.LastName)
-            .NotEmpty().WithMessage("Last name is required")
-            .IsValidName("Last name");
-
-        RuleFor(x => x.MiddleName)
-            .IsValidMiddleName();
+            .NotEmpty().WithMessage("Last name is required");
 
         RuleFor(x => x.DateOfBirth)
             .NotEmpty().WithMessage("Date of birth is required");
