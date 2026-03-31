@@ -100,7 +100,7 @@ export async function logout(){
 }
 
 export async function checkAuth() {
-  const response = await fetch(`${API_URL}/protected`, {
+  const response = await fetch(`${API_URL}/me`, {
     method: "GET",
     credentials: "include"
   });

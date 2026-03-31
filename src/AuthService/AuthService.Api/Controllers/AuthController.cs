@@ -11,6 +11,7 @@ using MedicalSystem.Shared.Contracts.Responses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using System.Security.Claims;
 
 namespace AuthService.Api.Controllers;
 
@@ -104,10 +105,13 @@ public class AuthController : ControllerBase
         return Ok(new MessageResponse("User role updated successfully"));
     }
 
-    [HttpGet("protected")]
+    [HttpGet("me")]
     [Authorize]
-    public IActionResult TestProtected()
+    public IActionResult GetCurrentUserInfo()
     {
-        return Ok(new MessageResponse("eeeeeee!"));
+        var id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        var role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+
+        return Ok(new { Id = id, Role = role });
     }
 }
