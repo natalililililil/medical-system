@@ -14,7 +14,7 @@ namespace Profiles.API.Controllers;
 
 [ApiController]
 [Route("api/profiles/doctors")]
-public class DoctorsController(IMediator _mediator, ILogger<DoctorsController> _logger) : ControllerBase
+public class DoctorsController(IMediator _mediator, ILogger<DoctorsController> _logger) : BaseProfilesController
 {
     [HttpGet]
     [EnableRateLimiting("ReadPolicy")]
@@ -45,14 +45,7 @@ public class DoctorsController(IMediator _mediator, ILogger<DoctorsController> _
     {
         _logger.LogInformation("Updating doctor profile");
 
-        var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-        if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var accountId))
-        {
-            _logger.LogWarning("Unauthorized update attempt: User ID not found in token");
-            throw new UnauthorizedException("USER_NOT_IDENTIFIED", "Cannot find user ID in token");
-        }
-
-        await _mediator.Send(new UpdateDoctorProfileCommand(accountId, request.FirstName, request.LastName, request.MiddleName, 
+        await _mediator.Send(new UpdateDoctorProfileCommand(CurrentAccountId, request.FirstName, request.LastName, request.MiddleName, 
             request.DateOfBirth, request.CareerStartYear, request.SpecializationId, request.OfficeId, request.PhotoUrl));
 
         return Ok(new { message = "Doctor's profile updated successfully" });
