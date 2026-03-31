@@ -19,7 +19,7 @@ public class PatientController(IMediator _mediator, ILogger<PatientController> _
         _logger.LogInformation("Updating patient profile");
 
         await _mediator.Send(new UpdatePatientProfileCommand(CurrentAccountId, request.FirstName, request.LastName, request.MiddleName,
-            request.DateOfBirth, request.Phone, request.Phone));
+            request.DateOfBirth, request.Photo, request.Phone));
 
         return Ok(new { message = "Patient's profile updated successfully" });
     }

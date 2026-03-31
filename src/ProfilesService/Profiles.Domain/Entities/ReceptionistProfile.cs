@@ -18,4 +18,13 @@ public class ReceptionistProfile
         OfficeId = officeId;
         PhotoUrl = photoUrl;
     }
+
+    public void Update(string firstName, string lastName, string? middleName, Guid officeId, string? photoUrl)
+    {
+        FirstName = firstName;
+        LastName = lastName;
+        MiddleName = middleName;
+        OfficeId = officeId;
+        PhotoUrl = photoUrl;
+    }
 }
