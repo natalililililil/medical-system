@@ -1,36 +1,63 @@
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { logout, checkAuth } from "../api/auth";
 import RegisterModal from "./RegisterModal";
 import LoginModal from "./LoginModal";
 
 export default function Header() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
   const [showRegister, setShowRegister] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  const navigate = useNavigate();
+  const dropdownRef = useRef(null);
 
   useEffect(() => {
     async function initAuth() {
       try {
-        await checkAuth();
-        setIsAuthenticated(true);
+        const authData = await checkAuth();
+
+        //const profile = await getMyProfile(authData.role);
+        setUser({ ...authData, photoUrl: null });
       } catch (e) {
-        setIsAuthenticated(false);
+        setUser(null);
       }
     }
     initAuth();
   }, []);
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   async function handleLogout() {
     try {
       await logout();
-      setIsAuthenticated(true); 
+      setUser(null);
+      navigate("/");
       window.location.reload();
     } catch (e) {
       console.error(e);
     }
   }
+
+  const getProfileLink = () => {
+    if (!user) return "/";
+    switch (user.role?.toLowerCase()) {
+      case "doctor": return "/doctor-profile";
+      case "patient": return "/patient-profile";
+      case "receptionist": return "/receptionist-profile";
+      default: return "/patient-profile";
+    }
+  };
 
   return (
     <>
@@ -41,7 +68,7 @@ export default function Header() {
         </Link>
 
         <div>
-          {!isAuthenticated ? (
+          {!user ? (
             <>
               <button className="register-button" onClick={() => setShowLogin(true)}>
                 Sign in
@@ -51,9 +78,30 @@ export default function Header() {
               </button>
             </>
           ) : (
-            <button className="register-button" onClick={handleLogout}>
-              Sign out
-            </button>
+            <div className="user-profile-section" ref={dropdownRef}>
+              <div className="avatar-wrapper" onClick={() => setShowDropdown(!showDropdown)}>
+                <img 
+                  src={user.photoUrl || "https://cdn-icons-png.flaticon.com/512/149/149071.png"} 
+                  alt="Profile" 
+                  className="header-avatar"
+                />
+              </div>
+
+              {showDropdown && (
+                <div className="profile-style-menu">
+                  <div className="menu-header">
+                    <span className="signed-in-as">Signed in as</span>
+                    <span className="username">{user.role}</span>
+                  </div>
+                  <div className="menu-divider"></div>
+                  <Link to={getProfileLink()} onClick={() => setShowDropdown(false)}>
+                    My profile
+                  </Link>
+                  <div className="menu-divider"></div>
+                  <button onClick={handleLogout} className="logout-button">Sign out</button>
+                </div>
+              )}
+            </div>
           )}
         </div>
 
@@ -74,8 +122,9 @@ export default function Header() {
       {showLogin && (
         <LoginModal 
           onClose={() => setShowLogin(false)} 
-          onLoginSuccess={() => {
-            setIsAuthenticated(true);
+          onLoginSuccess={async () => {
+            const authData = await checkAuth();
+            setUser(authData);
             setShowLogin(false);
           }} 
         />
