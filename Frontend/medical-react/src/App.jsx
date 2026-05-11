@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import Header from "./components/Header";
 import ConfirmEmail from "./components/ConfirmEmail";
 import DoctorsPage from "./pages/DoctorsPage";
+import ProfilePage from "./pages/ProfilePage";
 import "./App.css";
 
 function Home() {
@@ -27,6 +28,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/confirm-email" element={<ConfirmEmail />} />
           <Route path="/doctors" element={<DoctorsPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
         </Routes>
       </main>
     </BrowserRouter>

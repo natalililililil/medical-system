@@ -14,11 +14,16 @@ export default function DoctorsPage() {
     try {
       const data = await getDoctors(filters);
       
-      const validAndWorking = data.filter(d => {
-        const hasName = d.fullName && d.fullName.trim() !== "";
-        const isWorking = d.status === 1 || d.status === "AtWork";
-        return hasName && isWorking;
-    });
+      const validAndWorking = data
+        .map(d => ({
+                ...d,
+                fullName: d.fullName || `${d.lastName} ${d.firstName} ${d.middleName || ""}`.trim()
+            }))
+        .filter(d => {
+          const hasName = d.fullName && d.fullName.trim() !== "";
+          const isWorking = d.status === 1 || d.status === "AtWork";
+          return hasName && isWorking;
+        });
       
       setDoctors(validAndWorking);
     } catch (e) {

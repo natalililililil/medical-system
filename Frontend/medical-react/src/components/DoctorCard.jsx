@@ -9,7 +9,7 @@ export default function DoctorCard({ doctor }) {
       <div className="doctor-info">
         <h3>{doctor.fullName}</h3>
         <p><strong>Specialization:</strong> {doctor.specializationName}</p>
-        <p><strong>Experience:</strong> {doctor.experience} years</p>
+        <p><strong>Experience:</strong> {new Date().getFullYear() - doctor.careerStartYear + 1} years</p>
         <p><strong>Office ID:</strong> {doctor.officeId}</p>
         <span className="doctor-status"> At Work</span>
       </div>

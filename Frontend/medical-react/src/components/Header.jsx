@@ -50,13 +50,7 @@ export default function Header() {
   }
 
   const getProfileLink = () => {
-    if (!user) return "/";
-    switch (user.role?.toLowerCase()) {
-      case "doctor": return "/doctor-profile";
-      case "patient": return "/patient-profile";
-      case "receptionist": return "/receptionist-profile";
-      default: return "/patient-profile";
-    }
+    return "/profile";
   };
 
   return (
