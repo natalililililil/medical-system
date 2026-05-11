@@ -1,6 +1,6 @@
 import { errorMessages } from "../constants/errorMessages";
 
-const API_URL = "https://localhost:7117/api/auth";
+const API_URL = "https://localhost:7260/api/auth";
 window.fetchWithAuth = fetchWithAuth;
 
 export async function handleApiResponse(response) {
