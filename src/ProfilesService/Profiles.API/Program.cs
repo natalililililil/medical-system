@@ -39,18 +39,6 @@ builder.Services.AddMediatR(cfg =>
 
 builder.Services.AddOpenApi();
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("Frontend", policy =>
-    {
-        policy.WithOrigins("https://localhost:5173")
-            .AllowCredentials()
-            .AllowAnyHeader()
-            .AllowAnyMethod();
-    });
-});
-
-
 var jwtSection = builder.Configuration.GetSection("JwtSettings");
 var key = Encoding.UTF8.GetBytes(jwtSection["Secret"]);
 
@@ -118,8 +106,6 @@ if (app.Environment.IsDevelopment())
 app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseHttpsRedirection();
-
-app.UseCors("Frontend");
 
 app.UseAuthentication();
 app.UseAuthorization();
