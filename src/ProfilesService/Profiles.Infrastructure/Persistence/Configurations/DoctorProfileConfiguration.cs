@@ -40,8 +40,6 @@ public sealed class DoctorProfileConfiguration : IEntityTypeConfiguration<Doctor
         builder.Property(d => d.OfficeId)
             .IsRequired();
 
-        builder.Ignore(x => x.Experience);
-
         builder.HasOne(d => d.Specialization)
             .WithMany()
             .HasForeignKey(d => d.SpecializationId)

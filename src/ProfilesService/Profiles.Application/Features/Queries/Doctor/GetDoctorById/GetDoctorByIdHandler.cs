@@ -22,9 +22,11 @@ public class GetDoctorByIdHandler(IProfilesDbContext context, ILogger<GetDoctorB
 
         _logger.LogInformation("Successfully mapped profile for doctor: {LastName} (ID: {DoctorId})", doctor.LastName, request.Id);
         return new DoctorDetailsDto(
-            $"{doctor.LastName} {doctor.FirstName} {doctor.MiddleName}".Trim(),
+            doctor.LastName,
+            doctor.FirstName,
+            doctor.MiddleName,
             doctor.Specialization.Name,
-            doctor.Experience,
+            doctor.CareerStartYear,
             doctor.Status.ToString(),
             doctor.PhotoUrl,
             doctor.OfficeId,

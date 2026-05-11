@@ -5,7 +5,7 @@ namespace Profiles.Application.Features.DTOS;
 public record DoctorDto(
     string FullName, 
     string SpecializationName, 
-    int Experience, 
+    int CareerStartYear, 
     string? PhotoUrl,
     DoctorStatus Status,
     Guid OfficeId);

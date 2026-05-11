@@ -10,7 +10,7 @@
         }
       ],
       "UpstreamPathTemplate": "/api/profiles/{everything}",
-      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ],
+      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Patch", "Delete" ],
 
       "QoSOptions": {
         "ExceptionsAllowedBeforeBreaking": 3,
@@ -28,7 +28,7 @@
         }
       ],
       "UpstreamPathTemplate": "/api/auth/{everything}",
-      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ]
+      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Patch", "Delete" ]
     }
   ],
   "GlobalConfiguration": {

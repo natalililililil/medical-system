@@ -34,6 +34,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Элементы решен
 		docker-compose.yml = docker-compose.yml
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MedicalSystem.Gateway", "MedicalSystem.Gateway\MedicalSystem.Gateway.csproj", "{37887F62-18D6-4702-AABE-FCC941AD9E8A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -76,6 +78,10 @@ Global
 		{3E49FF54-F263-4871-944A-082F406A5A9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3E49FF54-F263-4871-944A-082F406A5A9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3E49FF54-F263-4871-944A-082F406A5A9D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{37887F62-18D6-4702-AABE-FCC941AD9E8A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{37887F62-18D6-4702-AABE-FCC941AD9E8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{37887F62-18D6-4702-AABE-FCC941AD9E8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{37887F62-18D6-4702-AABE-FCC941AD9E8A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -92,6 +98,7 @@ Global
 		{E5E00038-91BC-4C11-A0A1-E7E566727F49} = {28CD0C26-569E-4E4E-9C54-55CBFD4631E9}
 		{836E244F-A794-4A00-8A00-83718BCD4DBA} = {28CD0C26-569E-4E4E-9C54-55CBFD4631E9}
 		{3E49FF54-F263-4871-944A-082F406A5A9D} = {28C1D9F7-97F7-4C49-A2D5-E9FCAA05F1F0}
+		{37887F62-18D6-4702-AABE-FCC941AD9E8A} = {905EB272-1BFA-4A00-B1EE-F4C500653EDF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {728857B0-4E80-45D9-9BF8-684C9C2ABE63}

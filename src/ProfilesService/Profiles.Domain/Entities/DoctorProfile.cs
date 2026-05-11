@@ -13,7 +13,6 @@ public class DoctorProfile
     public Guid? SpecializationId { get; private set; }
     public Specialization? Specialization { get; private set; }
     public Guid OfficeId { get; private set; }
-    public int Experience => DateTime.UtcNow.Year - CareerStartYear + 1;
 
     private DoctorProfile() { }
     public DoctorProfile(Guid id, string firstName, string lastName, string? middleName, DateTime dateOfBirth, 
@@ -31,7 +30,7 @@ public class DoctorProfile
     }
 
     public void Update(string firstName, string lastName, string? middleName, DateTime dateOfBirth,
-        int careerStartYear, string? photoUrl, Guid? specializationId, Guid officeId)
+        int careerStartYear, Guid? specializationId, Guid officeId, DoctorStatus status, string? photoUrl)
     {
         FirstName = firstName;
         LastName = lastName;
@@ -40,6 +39,7 @@ public class DoctorProfile
         CareerStartYear = careerStartYear;
         SpecializationId = specializationId;
         OfficeId = officeId;
+        Status = status;
         PhotoUrl = photoUrl;
     }
 }
