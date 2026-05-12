@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { logout, checkAuth } from "../api/auth";
+import { logout, checkAuth, fetchWithAuth } from "../api/auth";
 import RegisterModal from "./RegisterModal";
 import LoginModal from "./LoginModal";
 
@@ -19,8 +19,10 @@ export default function Header() {
       try {
         const authData = await checkAuth();
 
-        //const profile = await getMyProfile(authData.role);
-        setUser({ ...authData, photoUrl: null });
+        const rolePath = authData.role.toLowerCase();
+        const profileData = await fetchWithAuth(`https://localhost:7260/api/profiles/${rolePath}s/me`);
+        
+        setUser({ ...authData, photoUrl: profileData.photoUrl });
       } catch (e) {
         setUser(null);
       }
