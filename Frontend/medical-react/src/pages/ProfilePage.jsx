@@ -15,6 +15,11 @@ export default function ProfilePage() {
 
         const rolePath = authData.role.toLowerCase();
         const data = await fetchWithAuth(`https://localhost:7260/api/profiles/${rolePath}s/me`);
+
+        if (data.status === "AtWork") data.status = 1;
+          else if (data.status === "OnVacation") data.status = 2;
+          else if (data.status === "Sick") data.status = 3;
+
         setProfile(data);
         setFormData(data);
       } catch (e) {
