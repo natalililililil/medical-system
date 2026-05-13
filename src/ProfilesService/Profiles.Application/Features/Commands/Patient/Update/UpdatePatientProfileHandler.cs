@@ -13,7 +13,7 @@ public class UpdatePatientProfileHandler(IProfilesDbContext _context, ILogger<Up
 
         var patient = await _context.PatientProfiles.GetProfileOrThrowAsync(request.AccountId, _logger, ct);
 
-        patient.Update(request.FirstName, request.LastName, request.MiddleName, request.DateOfBirth, request.Photo, request.Phone);
+        patient.Update(request.FirstName, request.LastName, request.MiddleName, request.DateOfBirth, request.PhotoUrl, request.Phone);
 
         _logger.LogInformation("Patient profile successfully updated for AccountId: {AccountId}", request.AccountId);
         return patient.AccountId;

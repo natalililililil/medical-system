@@ -13,7 +13,7 @@ using System.Security.Claims;
 namespace Profiles.API.Controllers;
 
 [ApiController]
-[Route("api/profiles/doctors")]
+[Route("api/profiles/doctor")]
 public class DoctorsController(IMediator _mediator, ILogger<DoctorsController> _logger) : BaseProfilesController
 {
     [HttpGet]
@@ -38,10 +38,13 @@ public class DoctorsController(IMediator _mediator, ILogger<DoctorsController> _
         return Ok(result);
     }
 
-    [Authorize(Roles = "Doctor")]
+    [Authorize(Roles = "Doctor, Receptionist")]
     [HttpGet("me")]
+    [EnableRateLimiting("ReadPolicy")]
     public async Task<ActionResult<DoctorDetailsDto>> GetMyProfile()
     {
+        _logger.LogInformation("Fetching doctor details for ID: {DoctorId}", CurrentAccountId);
+
         var result = await _mediator.Send(new GetDoctorByIdQuery(CurrentAccountId));
 
         return Ok(result);
