@@ -93,6 +93,11 @@ export default function Header() {
                   <Link to={getProfileLink()} onClick={() => setShowDropdown(false)}>
                     My profile
                   </Link>
+                  {user.role === 'Receptionist' && (
+                    <Link to="/users" onClick={() => setShowDropdown(false)}>
+                      Manage All Users
+                    </Link>
+                  )}
                   <div className="menu-divider"></div>
                   <button onClick={handleLogout} className="logout-button">Sign out</button>
                 </div>

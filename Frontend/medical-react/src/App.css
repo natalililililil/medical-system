@@ -523,3 +523,11 @@ body {
   color: #7f8c8d;
   border-top: 1px solid #eee;
 }
+
+.receptionist-warning { 
+  background-color: #fff3cd; 
+  padding: 10px; 
+  margin-bottom: 20px; 
+  border-radius: 5px;
+  border: 1px solid #ffeeba
+}

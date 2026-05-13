@@ -1,11 +1,15 @@
 import { useState, useEffect } from "react";
 import { fetchWithAuth } from "../api/auth";
+import { Link, useParams } from "react-router-dom";
 
 export default function ProfilePage() {
+  const { targetRole, targetId } = useParams();
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({});
+
+  const displayRole = targetRole ? (targetRole.charAt(0).toUpperCase() + targetRole.slice(1)) : (user?.role);
 
   useEffect(() => {
     async function loadData() {
@@ -13,8 +17,9 @@ export default function ProfilePage() {
         const authData = await fetchWithAuth("https://localhost:7260/api/auth/me");
         setUser(authData);
 
-        const rolePath = authData.role.toLowerCase();
-        const data = await fetchWithAuth(`https://localhost:7260/api/profiles/${rolePath}/me`);
+        const rolePath = targetRole || authData.role.toLowerCase();
+        const apiId = targetId ? targetId : "me";
+        const data = await fetchWithAuth(`https://localhost:7260/api/profiles/${rolePath}/${apiId}`);
 
         if (data.status === "AtWork") data.status = 1;
           else if (data.status === "OnVacation") data.status = 2;
@@ -27,12 +32,12 @@ export default function ProfilePage() {
       }
     }
     loadData();
-  }, []);
+  }, [targetId, targetRole]);
 
   const handleSave = async () => {
     try {
-
-      const role = user?.role;
+      const rolePath = displayRole.toLowerCase();
+      const apiId = targetId ? `/${targetId}` : "";
 
       let dataToSend = {
       firstName: formData.firstName,
@@ -42,7 +47,7 @@ export default function ProfilePage() {
       photoUrl: formData.photoUrl,
       };
 
-      if (role === 'Doctor') {
+      if (displayRole === 'Doctor') {
         dataToSend = {
           ...dataToSend,
           careerStartYear: parseInt(formData.careerStartYear || 0),
@@ -51,15 +56,20 @@ export default function ProfilePage() {
           status: parseInt(formData.status || 1)
         };
       }
-      else if (role === 'Patient') {
+      else if (displayRole === 'Patient') {
         dataToSend = {
           ...dataToSend,
           phone: formData.phone
         };
       }
+      else if (displayRole === 'Receptionist') {
+        dataToSend = {
+          ...dataToSend,
+          officeId: formData.officeId
+        };
+      }
 
-      const rolePath = role.toLowerCase();
-      await fetchWithAuth(`https://localhost:7260/api/profiles/${rolePath}/update`, {
+      await fetchWithAuth(`https://localhost:7260/api/profiles/${rolePath}/update${apiId}`, {
         method: 'PATCH',
         headers: {
         'Content-Type': 'application/json',
@@ -104,7 +114,13 @@ export default function ProfilePage() {
           </div>
 
           <div className="profile-main">
-            <h2 className="profile-title">{user.role} Profile</h2>
+
+            {targetId && (
+              <div className="receptionist-warning">
+                <strong>Receptionist Mode:</strong> You are editing profile for ID: {targetId}
+              </div>
+            )}
+            <h2 className="profile-title">{targetRole || user.role} Profile</h2>
             
             <div className="info-grid">
               <div className="info-item">
@@ -134,6 +150,7 @@ export default function ProfilePage() {
                 />
               </div>
 
+              {displayRole === 'Patient' || displayRole === 'Doctor' && (
               <div className="info-item">
                 <label>Date of Birth</label>
                 <input 
@@ -143,8 +160,9 @@ export default function ProfilePage() {
                   onChange={e => setFormData({...formData, dateOfBirth: e.target.value})}
                 />
               </div>
+              )}
 
-              {user.role === 'Patient' && (
+              {displayRole === 'Patient' && (
                 <div className="info-item">
                   <label>Phone Number</label>
                   <input 
@@ -155,7 +173,7 @@ export default function ProfilePage() {
                 </div>
               )}
 
-              {(user.role === 'Doctor' || user.role === 'Receptionist') && (
+              {(displayRole === 'Doctor') && (
                 <div className="info-item">
                   <label>Work Status</label>
                   <select 
@@ -171,7 +189,7 @@ export default function ProfilePage() {
                 </div>
               )}
 
-              {user.role === 'Doctor' && (
+              {displayRole === 'Doctor' && (
                 <div className="info-item">
                   <label>Career start year</label>
                   <input 
@@ -183,7 +201,7 @@ export default function ProfilePage() {
                 </div>
               )}
 
-              {(user.role === 'Doctor' || user.role === 'Receptionist') && (
+              {(displayRole === 'Doctor' || displayRole === 'Receptionist') && (
                 <div className="info-item">
                   <label>Office ID</label>
                   <input 
@@ -194,7 +212,7 @@ export default function ProfilePage() {
                 </div>
               )}
 
-              {(user.role === 'Doctor' || user.role === 'Receptionist') && (
+              {(displayRole === 'Doctor') && (
                 <div className="info-item">
                   <label>Specialization</label>
                   <input 
@@ -208,7 +226,7 @@ export default function ProfilePage() {
 
             <div className="profile-actions">
               {!isEditing ? (
-                <button className="action-btn edit" onClick={() => setIsEditing(true)}>Edit</button>
+                <button className="action-btn edit" onClick={() => setIsEditing(true)}>Edit</button>               
               ) : (
                 <div className="edit-buttons">
                   <button className="action-btn save" onClick={handleSave}>Save</button>
