@@ -3,6 +3,7 @@ import Header from "./components/Header";
 import ConfirmEmail from "./components/ConfirmEmail";
 import DoctorsPage from "./pages/DoctorsPage";
 import ProfilePage from "./pages/ProfilePage";
+import UsersListPage from "./pages/UsersListPage";
 import "./App.css";
 
 function Home() {
@@ -64,6 +65,8 @@ export default function App() {
           <Route path="/confirm-email" element={<ConfirmEmail />} />
           <Route path="/doctors" element={<DoctorsPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/profile/:targetRole/:targetId" element={<ProfilePage />} />
+          <Route path="/users" element={<UsersListPage />} />
         </Routes>
       </main>
     </BrowserRouter>
