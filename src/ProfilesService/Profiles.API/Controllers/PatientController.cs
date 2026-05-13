@@ -8,11 +8,23 @@ using Profiles.Application.Features.Queries.Patient.GetPatientById;
 
 namespace Profiles.API.Controllers;
 
-[Authorize(Roles = "Patient, Receptionist")]
 [ApiController]
 [Route("api/profiles/patient")]
 public class PatientController(IMediator _mediator, ILogger<PatientController> _logger) : BaseProfilesController
 {
+    [Authorize(Roles = "Receptionist")]
+    [HttpGet("{id:guid}")]
+    [EnableRateLimiting("ReadPolicy")]
+    public async Task<ActionResult> GetPatientById(Guid id)
+    {
+        _logger.LogInformation("Receptionist {CurrentUserId} is fetching patient profile: {Id}", CurrentAccountId, id);
+
+        var result = await _mediator.Send(new GetPatientByIdQuery(id));
+
+        return Ok(result);
+    }
+
+    [Authorize(Roles = "Patient")]
     [HttpGet("me")]
     [EnableRateLimiting("ReadPolicy")]
     public async Task<ActionResult> GetPatientProfile()
@@ -24,13 +36,16 @@ public class PatientController(IMediator _mediator, ILogger<PatientController> _
         return Ok(result);
     }
 
-    [HttpPatch("update")]
+    [Authorize(Roles = "Patient, Receptionist")]
+    [HttpPatch("update/{id:guid?}")]
     [EnableRateLimiting("WritePolicy")]
-    public async Task<ActionResult> UpdatePatientProfile([FromBody] UpdatePatientRequest request)
+    public async Task<ActionResult> UpdatePatientProfile([FromBody] UpdatePatientRequest request, Guid? id = null)
     {
         _logger.LogInformation("Updating patient profile");
 
-        await _mediator.Send(new UpdatePatientProfileCommand(CurrentAccountId, request.FirstName, request.LastName, request.MiddleName,
+        var targetId = (id.HasValue && User.IsInRole("Receptionist")) ? id.Value : CurrentAccountId;
+
+        await _mediator.Send(new UpdatePatientProfileCommand(targetId, request.FirstName, request.LastName, request.MiddleName,
             request.DateOfBirth, request.PhotoUrl, request.Phone));
 
         return Ok(new { message = "Patient's profile updated successfully" });

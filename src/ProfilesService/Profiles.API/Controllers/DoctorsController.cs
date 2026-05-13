@@ -38,7 +38,7 @@ public class DoctorsController(IMediator _mediator, ILogger<DoctorsController> _
         return Ok(result);
     }
 
-    [Authorize(Roles = "Doctor, Receptionist")]
+    [Authorize(Roles = "Doctor")]
     [HttpGet("me")]
     [EnableRateLimiting("ReadPolicy")]
     public async Task<ActionResult<DoctorDetailsDto>> GetMyProfile()
@@ -51,13 +51,15 @@ public class DoctorsController(IMediator _mediator, ILogger<DoctorsController> _
     }
 
     [Authorize(Roles = "Doctor, Receptionist")]
-    [HttpPatch("update")]
+    [HttpPatch("update/{id:guid?}")]
     [EnableRateLimiting("WritePolicy")]
-    public async Task<ActionResult> UpdateDoctorProfile([FromBody] UpdateDoctorRequest request)
+    public async Task<ActionResult> UpdateDoctorProfile([FromBody] UpdateDoctorRequest request, Guid? id = null)
     {
         _logger.LogInformation("Updating doctor profile");
 
-        await _mediator.Send(new UpdateDoctorProfileCommand(CurrentAccountId, request.FirstName, request.LastName, request.MiddleName, 
+        var targetId = (id.HasValue && User.IsInRole("Receptionist")) ? id.Value : CurrentAccountId;
+
+        await _mediator.Send(new UpdateDoctorProfileCommand(targetId, request.FirstName, request.LastName, request.MiddleName, 
             request.DateOfBirth, request.CareerStartYear, request.SpecializationName, request.OfficeId, request.Status, request.PhotoUrl));
 
         return Ok(new { message = "Doctor's profile updated successfully" });

@@ -13,7 +13,7 @@ public class UpdateReceptionistProfileHandler(IProfilesDbContext _context, ILogg
 
         var patient = await _context.ReceptionistProfiles.GetProfileOrThrowAsync(request.AccountId, _logger, ct);
 
-        patient.Update(request.FirstName, request.LastName, request.MiddleName, request.OfficeId, request.Photo);
+        patient.Update(request.FirstName, request.LastName, request.MiddleName, request.OfficeId, request.PhotoUrl);
 
         _logger.LogInformation("Receptionist profile successfully updated for AccountId: {AccountId}", request.AccountId);
         return patient.AccountId;
