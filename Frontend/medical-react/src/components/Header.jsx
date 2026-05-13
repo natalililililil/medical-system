@@ -20,7 +20,7 @@ export default function Header() {
         const authData = await checkAuth();
 
         const rolePath = authData.role.toLowerCase();
-        const profileData = await fetchWithAuth(`https://localhost:7260/api/profiles/${rolePath}s/me`);
+        const profileData = await fetchWithAuth(`https://localhost:7260/api/profiles/${rolePath}/me`);
         
         setUser({ ...authData, photoUrl: profileData.photoUrl });
       } catch (e) {

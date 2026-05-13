@@ -14,7 +14,7 @@ export default function ProfilePage() {
         setUser(authData);
 
         const rolePath = authData.role.toLowerCase();
-        const data = await fetchWithAuth(`https://localhost:7260/api/profiles/${rolePath}s/me`);
+        const data = await fetchWithAuth(`https://localhost:7260/api/profiles/${rolePath}/me`);
 
         if (data.status === "AtWork") data.status = 1;
           else if (data.status === "OnVacation") data.status = 2;
@@ -32,20 +32,34 @@ export default function ProfilePage() {
   const handleSave = async () => {
     try {
 
-      const dataToSend = {
+      const role = user?.role;
+
+      let dataToSend = {
       firstName: formData.firstName,
       lastName: formData.lastName,
       middleName: formData.middleName,
       dateOfBirth: formData.dateOfBirth,
-      careerStartYear: parseInt(formData.careerStartYear || 0),
       photoUrl: formData.photoUrl,
-      specializationName: formData.specializationName, 
-      officeId: formData.officeId,
-      status: parseInt(formData.status || 1)
       };
 
-      const rolePath = user.role.toLowerCase();
-      await fetchWithAuth(`https://localhost:7260/api/profiles/${rolePath}s/update`, {
+      if (role === 'Doctor') {
+        dataToSend = {
+          ...dataToSend,
+          careerStartYear: parseInt(formData.careerStartYear || 0),
+          specializationName: formData.specializationName,
+          officeId: formData.officeId,
+          status: parseInt(formData.status || 1)
+        };
+      }
+      else if (role === 'Patient') {
+        dataToSend = {
+          ...dataToSend,
+          phone: formData.phone
+        };
+      }
+
+      const rolePath = role.toLowerCase();
+      await fetchWithAuth(`https://localhost:7260/api/profiles/${rolePath}/update`, {
         method: 'PATCH',
         headers: {
         'Content-Type': 'application/json',
@@ -61,6 +75,17 @@ export default function ProfilePage() {
     }
   };
 
+  const handlePhotoUpdate = () => {
+    const newPhotoUrl = prompt("Please enter the URL of your new photo:", formData.photoUrl || "");
+
+    if (newPhotoUrl !== null) {
+    setFormData({
+      ...formData,
+      photoUrl: newPhotoUrl
+    });
+  }
+  }
+
   if (!profile) return <div className="loading-state">Loading...</div>;
 
   return (
@@ -71,7 +96,10 @@ export default function ProfilePage() {
           <div className="profile-aside">
             <div className="avatar-wrapper-in-profile">
               <img src={profile.photoUrl || "/default-avatar.png"} alt="Avatar" className="main-profile-img" />
-              {isEditing && <button className="change-photo-link">Update Photo</button>}
+              {isEditing && (
+                <button className="change-photo-link" onClick={handlePhotoUpdate} type="button">
+                  Update Photo
+                </button>)}
             </div>
           </div>
 
@@ -115,6 +143,17 @@ export default function ProfilePage() {
                   onChange={e => setFormData({...formData, dateOfBirth: e.target.value})}
                 />
               </div>
+
+              {user.role === 'Patient' && (
+                <div className="info-item">
+                  <label>Phone Number</label>
+                  <input 
+                    disabled={!isEditing} 
+                    value={formData.phone || ""} 
+                    onChange={e => setFormData({...formData, phone: e.target.value})}
+                  />
+                </div>
+              )}
 
               {(user.role === 'Doctor' || user.role === 'Receptionist') && (
                 <div className="info-item">

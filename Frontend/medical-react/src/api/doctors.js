@@ -13,7 +13,7 @@ export async function getDoctors(filters = {}) {
     }
   }
   
-  const url = `https://localhost:7260/api/profiles/doctors?${queryParams.toString()}`;
+  const url = `https://localhost:7260/api/profiles/doctor?${queryParams.toString()}`;
   
   const response = await fetch(url);
   if (!response.ok) throw new Error("Ошибка загрузки");
