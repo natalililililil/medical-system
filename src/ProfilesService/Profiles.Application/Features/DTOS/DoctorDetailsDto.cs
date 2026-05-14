@@ -4,7 +4,7 @@ public record DoctorDetailsDto(
     string LastName, 
     string FirstName,
     string MiddleName,
-    string SpecializationName, 
+    Guid? SpecializationId, 
     int CareerStartYear, 
     string Status, 
     string? PhotoUrl, 

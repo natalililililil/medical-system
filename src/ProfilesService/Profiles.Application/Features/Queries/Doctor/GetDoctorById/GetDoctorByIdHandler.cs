@@ -25,7 +25,7 @@ public class GetDoctorByIdHandler(IProfilesDbContext context, ILogger<GetDoctorB
             doctor.LastName,
             doctor.FirstName,
             doctor.MiddleName,
-            doctor.Specialization.Name,
+            doctor.SpecializationId,
             doctor.CareerStartYear,
             doctor.Status.ToString(),
             doctor.PhotoUrl,

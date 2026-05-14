@@ -37,7 +37,7 @@ public class GetDoctorsHandler(IProfilesDbContext context, ILogger<GetDoctorsHan
 
         var doctors = await query.Select(d => new DoctorDto(
             $"{d.LastName} {d.FirstName} {d.MiddleName}".Trim(),
-            d.Specialization != null ? d.Specialization.Name : "No specialization",
+            d.SpecializationId,
             d.CareerStartYear,
             d.PhotoUrl,
             d.Status,

@@ -27,7 +27,7 @@ public class UpdateDoctorProfileValidator : AbstractValidator<UpdateDoctorProfil
             .InclusiveBetween(1950, DateTime.Now.Year)
             .WithMessage("Incorrect career start year");
 
-        RuleFor(x => x.SpecializationName)
-            .NotEmpty().WithMessage("Specialization name is required");
+        RuleFor(x => x.SpecializationId)
+            .NotEmpty().WithMessage("Specialization ID is required");
     }
 }

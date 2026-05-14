@@ -15,17 +15,8 @@ public class UpdateDoctorProfileHandler(IProfilesDbContext _context, ILogger<Upd
 
         var doctor = await _context.DoctorProfiles.Include(d => d.Specialization).GetProfileOrThrowAsync(request.AccountId, _logger, ct);
 
-        var specId = doctor.SpecializationId;
-        if (!string.IsNullOrEmpty(request.SpecializationName))
-        {
-            var spec = await _context.Specializations.FirstOrDefaultAsync(s => s.Name == request.SpecializationName, ct);
-
-            if (spec != null) 
-                specId = spec.Id;
-        }
-
         doctor.Update(request.FirstName, request.LastName, request.MiddleName, request.DateOfBirth,
-           request.CareerStartYear, specId, request.OfficeId, (DoctorStatus)request.Status, request.PhotoUrl);
+           request.CareerStartYear, request.SpecializationId, request.OfficeId, (DoctorStatus)request.Status, request.PhotoUrl);
 
         _logger.LogInformation("Doctor profile successfully updated for AccountId: {AccountId}", request.AccountId);
         return doctor.AccountId;

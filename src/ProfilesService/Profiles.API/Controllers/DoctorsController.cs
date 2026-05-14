@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using MedicalSystem.Shared.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -8,7 +7,7 @@ using Profiles.Application.Features.Commands.Doctor.Update;
 using Profiles.Application.Features.DTOS;
 using Profiles.Application.Features.Queries.Doctor.GetDoctorById;
 using Profiles.Application.Features.Queries.Doctor.GetDoctors;
-using System.Security.Claims;
+using Profiles.Application.Features.Queries.Doctor.GetSpecializations;
 
 namespace Profiles.API.Controllers;
 
@@ -50,6 +49,16 @@ public class DoctorsController(IMediator _mediator, ILogger<DoctorsController> _
         return Ok(result);
     }
 
+    [HttpGet("specializations")]
+    public async Task<ActionResult<List<SpecializationDto>>> GetSpecializations()
+    {
+        _logger.LogInformation("Fetching list of doctor specializations");
+
+        var result = await _mediator.Send(new GetSpecializationsQuery());
+
+        return Ok(result);
+    }
+
     [Authorize(Roles = "Doctor, Receptionist")]
     [HttpPatch("update/{id:guid?}")]
     [EnableRateLimiting("WritePolicy")]
@@ -60,7 +69,7 @@ public class DoctorsController(IMediator _mediator, ILogger<DoctorsController> _
         var targetId = (id.HasValue && User.IsInRole("Receptionist")) ? id.Value : CurrentAccountId;
 
         await _mediator.Send(new UpdateDoctorProfileCommand(targetId, request.FirstName, request.LastName, request.MiddleName, 
-            request.DateOfBirth, request.CareerStartYear, request.SpecializationName, request.OfficeId, request.Status, request.PhotoUrl));
+            request.DateOfBirth, request.CareerStartYear, request.SpecializationId, request.OfficeId, request.Status, request.PhotoUrl));
 
         return Ok(new { message = "Doctor's profile updated successfully" });
     }
