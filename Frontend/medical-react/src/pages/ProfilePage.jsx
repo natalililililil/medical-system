@@ -8,8 +8,21 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({});
+  const [specializations, setSpecializations] = useState([]);
 
   const displayRole = targetRole ? (targetRole.charAt(0).toUpperCase() + targetRole.slice(1)) : (user?.role);
+
+  useEffect(() => {
+    async function loadSpecs(){
+      try {
+        const specs = await fetchWithAuth("https://localhost:7260/api/profiles/doctor/specializations");
+        setSpecializations(specs);
+      } catch (e) {
+        console.error("Failed to load specs", e);
+      }
+    }
+    loadSpecs();
+  }, []);
 
   useEffect(() => {
     async function loadData() {
@@ -51,7 +64,7 @@ export default function ProfilePage() {
         dataToSend = {
           ...dataToSend,
           careerStartYear: parseInt(formData.careerStartYear || 0),
-          specializationName: formData.specializationName,
+          specializationId: formData.specializationId,
           officeId: formData.officeId,
           status: parseInt(formData.status || 1)
         };
@@ -215,11 +228,19 @@ export default function ProfilePage() {
               {(displayRole === 'Doctor') && (
                 <div className="info-item">
                   <label>Specialization</label>
-                  <input 
+                  <select 
                     disabled={!isEditing} 
-                    value={formData.specializationName || ""} 
-                    onChange={e => setFormData({...formData, officeId: e.target.value})}
-                  />
+                    value={formData.specializationId || ""} 
+                    onChange={e => setFormData({...formData, specializationId: e.target.value})}
+                    className="status-select"
+                  >
+                    <option value="">Select specialization</option>
+                    {specializations.map(spec => (
+                      <option key={spec.id} value={spec.id}>
+                        {spec.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               )}
             </div>
