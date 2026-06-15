@@ -10,13 +10,14 @@ namespace AuthService.Application.Common;
 
 public class JwtTokenService(IConfiguration _configuration) : IJwtTokenService
 {
-    public string GenerateAccessToken(Guid accountId, string email)
+    public string GenerateAccessToken(Guid accountId, string email, string role)
     {
         var claims = new[]
         {
             new Claim(JwtRegisteredClaimNames.Sub, accountId.ToString()),
             new Claim(JwtRegisteredClaimNames.Email, email),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim(ClaimTypes.Role, role)
         };
 
         var jwtSection = _configuration.GetSection("JwtSettings");

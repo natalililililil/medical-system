@@ -8,129 +8,162 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace AuthService.Infrastructure.Migrations;
-
-[DbContext(typeof(AuthDbContext))]
-partial class AuthDbContextModelSnapshot : ModelSnapshot
+namespace AuthService.Infrastructure.Migrations
 {
-    protected override void BuildModel(ModelBuilder modelBuilder)
+    [DbContext(typeof(AuthDbContext))]
+    partial class AuthDbContextModelSnapshot : ModelSnapshot
     {
+        protected override void BuildModel(ModelBuilder modelBuilder)
+        {
 #pragma warning disable 612, 618
-        modelBuilder
-            .HasAnnotation("ProductVersion", "8.0.23")
-            .HasAnnotation("Relational:MaxIdentifierLength", 128);
+            modelBuilder
+                .HasAnnotation("ProductVersion", "8.0.24")
+                .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
-        SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-        modelBuilder.Entity("AuthService.Domain.Accounts.Account", b =>
-            {
-                b.Property<Guid>("Id")
-                    .ValueGeneratedOnAdd()
-                    .HasColumnType("uniqueidentifier");
+            modelBuilder.Entity("AuthService.Domain.Entities.Accounts.Account", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
-                b.Property<DateTime>("CreatedAt")
-                    .HasColumnType("datetime2");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
 
-                b.Property<string>("Email")
-                    .IsRequired()
-                    .HasMaxLength(256)
-                    .HasColumnType("nvarchar(256)");
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
-                b.Property<bool>("IsEmailVerified")
-                    .HasColumnType("bit");
+                    b.Property<bool>("IsEmailVerified")
+                        .HasColumnType("bit");
 
-                b.Property<string>("PasswordHash")
-                    .IsRequired()
-                    .HasColumnType("nvarchar(max)");
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                b.Property<int>("Role")
-                    .HasColumnType("int");
+                    b.Property<int>("Role")
+                        .HasColumnType("int");
 
-                b.HasKey("Id");
+                    b.HasKey("Id");
 
-                b.HasIndex("Email")
-                    .IsUnique();
+                    b.HasIndex("Email")
+                        .IsUnique();
 
-                b.ToTable("Accounts", (string)null);
-            });
+                    b.ToTable("Accounts", (string)null);
+                });
 
-        modelBuilder.Entity("AuthService.Domain.Accounts.RefreshToken", b =>
-            {
-                b.Property<Guid>("Id")
-                    .ValueGeneratedOnAdd()
-                    .HasColumnType("uniqueidentifier");
+            modelBuilder.Entity("AuthService.Domain.Entities.Accounts.RefreshToken", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
-                b.Property<Guid>("AccountId")
-                    .HasColumnType("uniqueidentifier");
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uniqueidentifier");
 
-                b.Property<DateTime>("ExpiresAt")
-                    .HasColumnType("datetime2");
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
 
-                b.Property<DateTime?>("RevokedAt")
-                    .HasColumnType("datetime2");
+                    b.Property<DateTime?>("RevokedAt")
+                        .HasColumnType("datetime2");
 
-                b.Property<string>("Token")
-                    .IsRequired()
-                    .HasMaxLength(500)
-                    .HasColumnType("nvarchar(500)");
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
-                b.HasKey("Id");
+                    b.HasKey("Id");
 
-                b.HasIndex("AccountId");
+                    b.HasIndex("AccountId");
 
-                b.HasIndex("Token")
-                    .IsUnique();
+                    b.HasIndex("Token")
+                        .IsUnique();
 
-                b.ToTable("RefreshTokens", (string)null);
-            });
+                    b.ToTable("RefreshTokens", (string)null);
+                });
 
-        modelBuilder.Entity("AuthService.Domain.Tokens.EmailConfirmationToken", b =>
-            {
-                b.Property<Guid>("Id")
-                    .ValueGeneratedOnAdd()
-                    .HasColumnType("uniqueidentifier");
+            modelBuilder.Entity("AuthService.Domain.Entities.Outbox.OutboxMessage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
-                b.Property<Guid>("AccountId")
-                    .HasColumnType("uniqueidentifier");
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                b.Property<DateTime>("ExpiresAt")
-                    .HasColumnType("datetime2");
+                    b.Property<string>("Error")
+                        .HasColumnType("nvarchar(max)");
 
-                b.Property<bool>("IsUsed")
-                    .HasColumnType("bit");
+                    b.Property<DateTime>("OccurredOnUtc")
+                        .HasColumnType("datetime2");
 
-                b.Property<string>("Token")
-                    .IsRequired()
-                    .HasMaxLength(200)
-                    .HasColumnType("nvarchar(200)");
+                    b.Property<DateTime?>("ProcessedOnUtc")
+                        .HasColumnType("datetime2");
 
-                b.HasKey("Id");
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
-                b.HasIndex("AccountId");
+                    b.HasKey("Id");
 
-                b.HasIndex("Token")
-                    .IsUnique();
+                    b.HasIndex("ProcessedOnUtc")
+                        .HasFilter("[ProcessedOnUtc] IS NULL");
 
-                b.ToTable("EmailConfirmationTokens", (string)null);
-            });
+                    b.ToTable("OutboxMessages", (string)null);
+                });
 
-        modelBuilder.Entity("AuthService.Domain.Accounts.RefreshToken", b =>
-            {
-                b.HasOne("AuthService.Domain.Accounts.Account", null)
-                    .WithMany()
-                    .HasForeignKey("AccountId")
-                    .OnDelete(DeleteBehavior.Cascade)
-                    .IsRequired();
-            });
+            modelBuilder.Entity("AuthService.Domain.Entities.Tokens.EmailConfirmationToken", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
-        modelBuilder.Entity("AuthService.Domain.Tokens.EmailConfirmationToken", b =>
-            {
-                b.HasOne("AuthService.Domain.Accounts.Account", null)
-                    .WithMany()
-                    .HasForeignKey("AccountId")
-                    .OnDelete(DeleteBehavior.Cascade)
-                    .IsRequired();
-            });
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountId");
+
+                    b.HasIndex("Token")
+                        .IsUnique();
+
+                    b.ToTable("EmailConfirmationTokens", (string)null);
+                });
+
+            modelBuilder.Entity("AuthService.Domain.Entities.Accounts.RefreshToken", b =>
+                {
+                    b.HasOne("AuthService.Domain.Entities.Accounts.Account", null)
+                        .WithMany()
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("AuthService.Domain.Entities.Tokens.EmailConfirmationToken", b =>
+                {
+                    b.HasOne("AuthService.Domain.Entities.Accounts.Account", null)
+                        .WithMany()
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
 #pragma warning restore 612, 618
+        }
     }
 }

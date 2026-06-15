@@ -2,7 +2,7 @@ import { useState } from "react";
 import { login } from "../api/auth";
 import "../App.css";
 
-export default function LoginModal({ onClose }) {
+export default function LoginModal({ onClose, onLoginSuccess }) {
   const [values, setValues] = useState({ email: "", password: "" });
   const [touched, setTouched] = useState({});
   const [serverError, setServerError] = useState("");
@@ -41,6 +41,7 @@ export default function LoginModal({ onClose }) {
     try {
       await login(values);
       setSuccessMessage("Successfully logged in!");
+      onLoginSuccess();
       setTimeout(() => onClose(), 1500);
     } catch (err) {
       setServerError(err.message);

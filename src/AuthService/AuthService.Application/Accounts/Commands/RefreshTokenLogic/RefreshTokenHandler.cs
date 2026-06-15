@@ -1,9 +1,9 @@
 ﻿using AuthService.Application.Accounts.DTOs;
-using AuthService.Application.Common.Exceptions;
 using AuthService.Application.Common.Interfaces;
-using AuthService.Domain.Accounts;
+using AuthService.Domain.Entities.Accounts;
 using AuthService.Domain.Interfaces;
 using MediatR;
+using MedicalSystem.Shared.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -42,7 +42,7 @@ public class RefreshTokenHandler(IAuthDbContext context, IJwtTokenService jwt, I
 
         context.RefreshTokens.Add(newRefresh);
 
-        var access = jwt.GenerateAccessToken(account.Id, account.Email);
+        var access = jwt.GenerateAccessToken(account.Id, account.Email, account.Role.ToString());
 
         logger.LogInformation("Refresh token successfully used for account {AccountId}", account.Id);
 

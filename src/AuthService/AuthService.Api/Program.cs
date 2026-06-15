@@ -1,18 +1,21 @@
-using AuthService.Api.Middleware;
 using AuthService.Api.Services.Cookies;
 using AuthService.Application.Accounts.Commands.RegisterAccount;
 using AuthService.Application.Common;
 using AuthService.Application.Common.Interfaces;
 using AuthService.Domain.Interfaces;
-using AuthService.Infrastructure;
+using AuthService.Infrastructure.Outbox;
 using AuthService.Infrastructure.Persistence;
+using Confluent.Kafka;
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using MediatR;
+using MedicalSystem.Shared.Behaviors;
+using MedicalSystem.Shared.Interfaces;
+using MedicalSystem.Shared.MessageBroker.Kafka;
+using MedicalSystem.Shared.Middleware;
+using MedicalSystem.Shared.Outbox.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -22,34 +25,31 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AuthDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("AuthDb")));
 
-builder.Services.AddScoped<IAuthDbContext>(provider => provider.GetRequiredService<AuthDbContext>());
+builder.Services.AddScoped<IAuthDbContext>(x => x.GetRequiredService<AuthDbContext>());
+builder.Services.AddScoped<IAppDbContext>(x => x.GetRequiredService<AuthDbContext>());
+builder.Services.AddScoped<IHasOutbox>(x => x.GetRequiredService<AuthDbContext>());
 
 builder.Services.AddControllers();
 
 builder.Services.AddValidatorsFromAssembly(typeof(RegisterAccountValidator).Assembly);
 builder.Services.AddFluentValidationAutoValidation();
 
-builder.Services.AddTransient(typeof(IPipelineBehavior<,>),typeof(ValidationBehavior<,>));
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
-builder.Services.AddScoped<ITokenCookieService, TokenCookieService>();
-builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
-builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(TransactionBehavior<,>));
+
+builder.Services.AddScoped<TokenCookieService>();
+builder.Services.AddScoped<ITokenCookieService>(x => x.GetRequiredService<TokenCookieService>());
+builder.Services.AddScoped<IAuthCookieCleaner>(x => x.GetRequiredService<TokenCookieService>());
 
 builder.Services.AddMediatR(cfg =>
-    cfg.RegisterServicesFromAssembly(typeof(RegisterAccountCommand).Assembly));
+{
+    cfg.RegisterServicesFromAssembly(typeof(RegisterAccountCommand).Assembly);
+    cfg.AddOpenBehavior(typeof(LoggingBehavior<,>));
+    cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
+    cfg.AddOpenBehavior(typeof(TransactionBehavior<,>));
+});
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("Frontend", policy =>
-    {
-        policy.WithOrigins("https://localhost:5173")
-            .AllowCredentials()
-            .AllowAnyHeader()
-            .AllowAnyMethod();
-    });
-});
 
 var jwtSection = builder.Configuration.GetSection("JwtSettings");
 var key = Encoding.UTF8.GetBytes(jwtSection["Secret"]);
@@ -105,6 +105,14 @@ builder.Services.AddRateLimiter(options =>
     });
 });
 
+builder.Services.AddSingleton<IProducer<string, string>>(sp =>
+{
+    var config = new ProducerConfig { BootstrapServers = "localhost:9092" };
+    return new ProducerBuilder<string, string>(config).Build();
+});
+builder.Services.AddSingleton<IMessageBroker, BaseKafkaProducer>();
+builder.Services.AddHostedService<AuthOutboxWorker>();
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -117,8 +125,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-app.UseCors("Frontend");
 
 app.UseRateLimiter();
 app.UseAuthentication();

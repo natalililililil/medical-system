@@ -1,5 +1,5 @@
-﻿using AuthService.Domain.Accounts;
-using AuthService.Domain.Tokens;
+﻿using AuthService.Domain.Entities.Accounts;
+using AuthService.Domain.Entities.Tokens;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

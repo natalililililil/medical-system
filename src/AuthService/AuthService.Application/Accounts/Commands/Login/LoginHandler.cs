@@ -1,9 +1,9 @@
 ﻿using AuthService.Application.Accounts.DTOs;
-using AuthService.Application.Common.Exceptions;
 using AuthService.Application.Common.Interfaces;
-using AuthService.Domain.Accounts;
+using AuthService.Domain.Entities.Accounts;
 using AuthService.Domain.Interfaces;
 using MediatR;
+using MedicalSystem.Shared.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -33,7 +33,7 @@ public class LoginHandler(IAuthDbContext context, IJwtTokenService jwtTokenServi
             token.Revoke();
         logger.LogInformation("Revoked {Count} old tokens for account {Email}", oldTokens.Count, request.Email);
 
-        var accessToken = jwtTokenService.GenerateAccessToken(account.Id, account.Email);
+        var accessToken = jwtTokenService.GenerateAccessToken(account.Id, account.Email, account.Role.ToString());
         var newRefreshTokenValue = jwtTokenService.GenerateRefreshToken();
         var newRefreshToken = new RefreshToken(account.Id, newRefreshTokenValue, DateTime.UtcNow.AddDays(7));
 

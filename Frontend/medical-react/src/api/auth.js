@@ -1,6 +1,6 @@
 import { errorMessages } from "../constants/errorMessages";
 
-const API_URL = "https://localhost:7117/api/auth";
+const API_URL = "https://localhost:7260/api/auth";
 window.fetchWithAuth = fetchWithAuth;
 
 export async function handleApiResponse(response) {
@@ -84,4 +84,29 @@ export async function fetchWithAuth(url, options = {}) {
   }
 
   return handleApiResponse(response);
+}
+
+export async function logout(){
+    const response = await fetch(`${API_URL}/logout`, {
+    method: "POST",
+    credentials: "include"
+  });
+
+    if (!response.ok){
+      throw new Error("Logout failed!");
+  }
+
+  return true;
+}
+
+export async function checkAuth() {
+  const response = await fetch(`${API_URL}/me`, {
+    method: "GET",
+    credentials: "include"
+  });
+  
+  if (!response.ok) {
+    throw new Error("Not authorized");
+  }
+  return await response.json();
 }

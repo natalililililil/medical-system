@@ -1,7 +1,9 @@
 ﻿
+using MedicalSystem.Shared.Interfaces;
+
 namespace AuthService.Api.Services.Cookies;
 
-public class TokenCookieService : ITokenCookieService
+public class TokenCookieService : ITokenCookieService, IAuthCookieCleaner
 {
     public void SetAuthCookies(HttpResponse response, string accessToken, string refreshToken)
     {
@@ -24,6 +26,7 @@ public class TokenCookieService : ITokenCookieService
         response.Cookies.Append("accessToken", accessToken, accessTokenCookieOptions);
         response.Cookies.Append("refreshToken", refreshToken, refreshTokenCookieOptions);
     }
+    public void Clear(HttpResponse response) => ClearAuthCookies(response);
 
     public void ClearAuthCookies(HttpResponse response)
     {

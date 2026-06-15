@@ -1,0 +1,19 @@
+[
+  {
+    "Name": "Новый профиль",
+    "Projects": [
+      {
+        "Path": "src\\AuthService\\AuthService.Api\\AuthService.Api.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "src\\ProfilesService\\Profiles.API\\Profiles.API.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "MedicalSystem.Gateway\\MedicalSystem.Gateway.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

@@ -1,15 +1,17 @@
-﻿using AuthService.Api.Contracts.Responses;
-using AuthService.Api.Services.Cookies;
+﻿using AuthService.Api.Services.Cookies;
+using AuthService.Application.Accounts.Commands.ChangeUserRole;
 using AuthService.Application.Accounts.Commands.ConfirmEmail;
 using AuthService.Application.Accounts.Commands.Login;
+using AuthService.Application.Accounts.Commands.Logout;
 using AuthService.Application.Accounts.Commands.RefreshTokenLogic;
 using AuthService.Application.Accounts.Commands.RegisterAccount;
 using AuthService.Application.Accounts.DTOs;
-using AuthService.Application.Common.Exceptions;
 using MediatR;
+using MedicalSystem.Shared.Contracts.Responses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using System.Security.Claims;
 
 namespace AuthService.Api.Controllers;
 
@@ -33,7 +35,7 @@ public class AuthController : ControllerBase
     {
         _logger.LogInformation("Registration attempt for email: {Email}", request.Email);
 
-        await _mediator.Send(new RegisterAccountCommand(request.Email, request.Password, request.ConfirmPassword));
+        await _mediator.Send(new RegisterAccountCommand(request.Email, request.Password, request.ConfirmPassword, request.Role));
 
         return Ok(new MessageResponse("Registration completed successfully"));
     }
@@ -69,6 +71,7 @@ public class AuthController : ControllerBase
         _logger.LogInformation("Refresh token attempt");
 
         var refreshToken = Request.Cookies["refreshToken"];
+
         var tokens = await _mediator.Send(new RefreshTokenCommand(refreshToken));
 
         _cookieService.SetAuthCookies(Response, tokens.AccessToken, tokens.RefreshToken);
@@ -76,10 +79,39 @@ public class AuthController : ControllerBase
         return Ok(new { message = "Token refreshed" });
     }
 
-    [HttpGet("protected")]
-    [Authorize]
-    public IActionResult TestProtected()
+    [EnableRateLimiting("AuthPolicy")]
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout()
     {
-        return Ok(new MessageResponse("eeeeeee!"));
+        _logger.LogInformation("Logout attempt");
+
+        var refreshToken = Request.Cookies["refreshToken"];
+
+        await _mediator.Send(new LogoutCommand(refreshToken));
+
+        _cookieService.ClearAuthCookies(Response);
+
+        return Ok(new { message = "Logout successful" });
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpPatch("{id}/role")]
+    public async Task<IActionResult> ChangeRole(Guid id, [FromBody] ChangeUserRoleRequest newRole)
+    {
+        _logger.LogInformation("Change role attempt");
+
+        await _mediator.Send(new ChangeUserRoleCommand(id, newRole.RoleName));
+
+        return Ok(new MessageResponse("User role updated successfully"));
+    }
+
+    [HttpGet("me")]
+    [Authorize]
+    public IActionResult GetCurrentUserInfo()
+    {
+        var id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        var role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+
+        return Ok(new { Id = id, Role = role });
     }
 }
